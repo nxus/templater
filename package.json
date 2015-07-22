@@ -1,6 +1,6 @@
 {
   "name": "@nxus/template-manager",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "The template manager for Nxus applications",
   "main": "index.js",
   "scripts": {
@@ -20,12 +20,12 @@
   "homepage": "https://github.com/nxus/template-manager",
   "dependencies": {
     "ejs": "^2.3.3",
-    "underscore": "^1.8.3"
+    "underscore": "^1.8.3",
+    "babel-runtime": "^5.7.0"
   },
   "devDependencies": {
     "babel": "^5.6.23",
     "mocha": "^2.2.5",
-    "should": "^7.0.2",
-    "babel-runtime": "^5.7.0"
+    "should": "^7.0.2"
   }
 }
