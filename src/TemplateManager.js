@@ -23,7 +23,6 @@ class TemplateManager {
     })
 
     app.on('template.render', (name, opts, callback) => {
-      app.log('render called for', name)
       if(_.isFunction(opts)) {
         callback = opts
         opts = {}
