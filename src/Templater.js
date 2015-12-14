@@ -16,7 +16,7 @@ export default class Templater {
     this._templates = {}
 
     app.get('templater').gather('template').each(this._register.bind(this));
-    app.get('templater').on('render', this._render.bind(this));
+    app.get('templater').respond('render', this._render.bind(this));
 
   }
 
@@ -27,6 +27,6 @@ export default class Templater {
   _render(name, args) {
     if(!this._templates[name]) throw new Error('Template name '+name+' not found')
     var opts = this._templates[name]
-    return this.app.get('renderer').emit('renderFile').with(opts.filename, args).spread((content) => {return content});
+    return this.app.get('renderer').request('renderFile', opts.filename, args);
   }
 }
