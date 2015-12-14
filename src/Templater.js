@@ -20,7 +20,7 @@ export default class Templater {
 
   }
 
-  _register([name, type, filename]) {
+  _register(name, type, filename) {
     this._templates[name] = {type, filename}
   }
 
