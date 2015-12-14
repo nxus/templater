@@ -15,7 +15,7 @@ export default class Templater {
 
     this._templates = {}
 
-    app.get('templater').gather('template').each(this._register.bind(this));
+    app.get('templater').gather('template', this._register.bind(this));
     app.get('templater').respond('render', this._render.bind(this));
 
   }
