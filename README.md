@@ -6,7 +6,7 @@ The template manager for Nxus applications
 ### Register a Template
 
 ```
-app.get('templater').send('template').with('default', 'ejs', 'path/to/some/file')
+app.get('templater').provide('template', 'default', 'ejs', 'path/to/some/file')
 ```
 
 ### Render content using a Template
@@ -14,7 +14,7 @@ app.get('templater').send('template').with('default', 'ejs', 'path/to/some/file'
 ```
 let opts = {content: "some content"}
 
-app.get('templater').emit('render').with('default', opts).then((content) => {
+app.get('templater').request('render', 'default', opts).then((content) => {
   console.log('rendered content', content)
 })
 ```

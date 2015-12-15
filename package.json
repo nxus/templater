@@ -1,6 +1,6 @@
 {
   "name": "@nxus/templater",
-  "version": "1.0.2",
+  "version": "2.1.0",
   "description": "The template manager for Nxus applications",
   "main": "lib/Templater.js",
   "scripts": {
@@ -23,8 +23,8 @@
     "bluebird": "^3.0.6"
   },
   "peerDependencies": {
-    "@nxus/core": "^2.0.0",
-    "@nxus/renderer": "^2.0.0"
+    "@nxus/core": "^2.1.0",
+    "@nxus/renderer": "^2.1.0"
   },
   "devDependencies": {
     "babel": "^5.6.23",
