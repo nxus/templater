@@ -1,12 +1,13 @@
 /* 
 * @Author: Mike Reich
 * @Date:   2015-07-22 09:45:05
-* @Last Modified 2015-12-15
+* @Last Modified 2015-12-16
 */
 
 'use strict';
 
 require('babel-runtime/core-js/promise').default = require('bluebird');
+import fs from 'fs';
 
 export default class Templater {
 
@@ -17,11 +18,27 @@ export default class Templater {
 
     app.get('templater').gather('template', this._register.bind(this));
     app.get('templater').respond('render', this._render.bind(this));
-
+    app.get('templater').request('renderPartial', this._renderPartial.bind(this));
   }
 
   _register(name, type, handler) {
     this._templates[name] = {type, handler}
+  }
+
+  _renderPartial(filePath, baseName, args = {}) {
+    
+    if(fs.existsSync(filePath)) {
+      if(!args.filename) args.filename = filePath
+      console.log('file partial')
+      return this.app.get('renderer').request('renderFile', filePath, args).then((content) => {
+        args.content = content
+        return this._render(baseName, args)
+      })
+    } else
+      return this._render(filePath, args).then((content) => {
+        ags.content = content
+        return this._render(baseName, args)
+      })
   }
 
   _render(name, args = {}) {
