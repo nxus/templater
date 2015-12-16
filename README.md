@@ -1,6 +1,12 @@
 # Templater
 Templates are markup (html, ejs, etc) that Nxus modules can use to render a UX.  The Templater module provides a common API for defining and accessing templates.  Specifically, you can use partials and templates defined by other modules, meaning you write less code for common components.
 
+## Installation
+
+```
+> npm install @nxus/templater --save
+```
+
 ## Parsers
 
 Templater supports EJS and HTML as default template types.  If you'd like to add in additional parsers, check out the @nxus/renderer documentation.
@@ -68,4 +74,3 @@ app.get('templater').request('renderPartial', 'partial-template', 'wrapper-templ
   console.log('rendered partial content', content)l
 })
 ```
-
