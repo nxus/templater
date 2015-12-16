@@ -24,7 +24,7 @@ export default class Templater {
     this._templates[name] = {type, handler}
   }
 
-  _render(name, args) {
+  _render(name, args = {}) {
     if(!this._templates[name]) throw new Error('Template name '+name+' not found')
     var opts = this._templates[name]
     if(typeof opts.handler === 'string') {
@@ -32,7 +32,6 @@ export default class Templater {
       return this.app.get('renderer').request('renderFile', opts.handler, args);
     } else { //assume its a callable returning a promise
       return opts.handler(name, args).then((template) => {
-        console.log('template returned', template)
         return this.app.get('renderer').request('render', opts.type, template, args)
       })
     }
