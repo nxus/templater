@@ -18,7 +18,7 @@ export default class Templater {
 
     app.get('templater').gather('template', this._register.bind(this));
     app.get('templater').respond('render', this._render.bind(this));
-    app.get('templater').request('renderPartial', this._renderPartial.bind(this));
+    app.get('templater').respond('renderPartial', this._renderPartial.bind(this));
   }
 
   _register(name, type, handler) {
@@ -26,7 +26,7 @@ export default class Templater {
   }
 
   _renderPartial(filePath, baseName, args = {}) {
-    
+    console.log('rendering partial')
     if(fs.existsSync(filePath)) {
       if(!args.filename) args.filename = filePath
       console.log('file partial')
@@ -34,14 +34,17 @@ export default class Templater {
         args.content = content
         return this._render(baseName, args)
       })
-    } else
+    } else {
+      console.log('rendering template', filePath)
       return this._render(filePath, args).then((content) => {
-        ags.content = content
+        args.content = content
         return this._render(baseName, args)
       })
+    }
   }
 
   _render(name, args = {}) {
+    console.log('render')
     if(!this._templates[name]) throw new Error('Template name '+name+' not found')
     var opts = this._templates[name]
     if(typeof opts.handler === 'string') {
