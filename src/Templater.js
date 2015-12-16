@@ -48,16 +48,13 @@ export default class Templater {
   }
 
   _renderPartial(filePath, baseName, args = {}) {
-    console.log('rendering partial')
     if(fs.existsSync(filePath)) {
       if(!args.filename) args.filename = filePath
-      console.log('file partial')
       return this.app.get('renderer').request('renderFile', filePath, args).then((content) => {
         args.content = content
         return this._render(baseName, args)
       })
     } else {
-      console.log('rendering template', filePath)
       return this._render(filePath, args).then((content) => {
         args.content = content
         return this._render(baseName, args)
@@ -66,7 +63,6 @@ export default class Templater {
   }
 
   _render(name, args = {}) {
-    console.log('render')
     if(!this._templates[name]) throw new Error('Template name '+name+' not found')
     var opts = this._templates[name]
     if(typeof opts.handler === 'string') {
