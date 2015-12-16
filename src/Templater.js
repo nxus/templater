@@ -30,19 +30,21 @@ export default class Templater {
     this._templates[name] = {type, handler}
   }
 
-  _registerDir(type, dir) {
+  _registerDir(type, dir, namespace = "") {
     var opts = {
       cwd: dir,
       dot: true,
       mark: true
     }
 
+    if(namespace.length > 0) namespace = namespace+"-"
+
     let pattern = "*."+type
 
     return globAsync(pattern, opts).then((files) => {
       files.forEach((file) => {
         var name = file.replace("."+type, "")
-        this._register(name, type, dir+"/"+file)
+        this._register(namespace+name, type, dir+"/"+file)
       })
     });
   }
