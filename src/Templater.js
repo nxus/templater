@@ -8,6 +8,10 @@
 
 require('babel-runtime/core-js/promise').default = require('bluebird');
 import fs from 'fs';
+import glob from 'glob';
+
+import Promise from 'bluebird';
+var globAsync = Promise.promisify(glob);
 
 export default class Templater {
 
@@ -17,12 +21,30 @@ export default class Templater {
     this._templates = {}
 
     app.get('templater').gather('template', this._register.bind(this));
+    app.get('templater').gather('templateDir', this._registerDir.bind(this));
     app.get('templater').respond('render', this._render.bind(this));
     app.get('templater').respond('renderPartial', this._renderPartial.bind(this));
   }
 
   _register(name, type, handler) {
     this._templates[name] = {type, handler}
+  }
+
+  _registerDir(type, dir) {
+    var opts = {
+      cwd: dir,
+      dot: true,
+      mark: true
+    }
+
+    let pattern = "*."+type
+
+    return globAsync(pattern, opts).then((files) => {
+      files.forEach((file) => {
+        var name = file.replace("."+type, "")
+        this._register(name, type, dir+"/"+file)
+      })
+    });
   }
 
   _renderPartial(filePath, baseName, args = {}) {
