@@ -1,7 +1,7 @@
 /* 
 * @Author: Mike Reich
 * @Date:   2015-07-22 09:45:05
-* @Last Modified 2015-12-16
+* @Last Modified 2016-02-04
 */
 
 'use strict';
@@ -13,9 +13,14 @@ import glob from 'glob';
 import Promise from 'bluebird';
 var globAsync = Promise.promisify(glob);
 
+import DefaultTemplate from '../templates/default'
+
 export default class Templater {
 
   constructor(app) {
+
+    new DefaultTemplate(app)
+
     this.app = app
 
     this._templates = {}
