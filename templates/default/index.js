@@ -9,9 +9,7 @@
 module.exports = function(app){
   var templater = app.get('templater')
 
-  templater.provide('templateDir', 'ejs', __dirname, "default");
-
-  templater.provide('template', "default", "ejs", __dirname+"/default.ejs");
+  templater.provide('templateDir', "ejs", __dirname);
 
   app.get('router').provide('static', "/dist", __dirname+"/dist")
   app.get('router').provide('static', "/js", __dirname+"/js")
