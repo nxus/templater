@@ -50,7 +50,7 @@ export default class Templater {
     return globAsync(pattern, opts).then((files) => {
       files.forEach((file) => {
         var name = file.replace("."+type, "")
-        this._register(namespace+name, type, dir+"/"+file)
+        this.register(namespace+name, type, dir+"/"+file)
       })
     });
   }
