@@ -50,7 +50,7 @@ export default class Templater {
     return globAsync(pattern, opts).then((files) => {
       files.forEach((file) => {
         var name = file.replace("."+type, "")
-        this.register(namespace+name, type, dir+"/"+file)
+        this.template(namespace+name, type, dir+"/"+file)
       })
     });
   }
@@ -58,14 +58,14 @@ export default class Templater {
   renderPartial(filePath, baseName, args = {}) {
     if(fs.existsSync(filePath)) {
       if(!args.filename) args.filename = filePath
-      return this.app.get('renderer').request('renderFile', filePath, args).then((content) => {
+      return this.app.get('renderer').renderFile(filePath, args).then((content) => {
         args.content = content
-        return this._render(baseName, args)
+        return this.render(baseName, args)
       })
     } else {
-      return this._render(filePath, args).then((content) => {
+      return this.render(filePath, args).then((content) => {
         args.content = content
-        return this._render(baseName, args)
+        return this.render(baseName, args)
       })
     }
   }
@@ -75,10 +75,10 @@ export default class Templater {
     var opts = this._templates[name]
     if(typeof opts.handler === 'string') {
       args.filename = opts.handler
-      return this.app.get('renderer').request('renderFile', opts.handler, args);
+      return this.app.get('renderer').renderFile(opts.handler, args);
     } else { //assume its a callable returning a promise
       return Promise.resolve(opts.handler(name, args)).then((template) => {
-        return this.app.get('renderer').request('render', opts.type, template, args)
+        return this.app.get('renderer').render(opts.type, template, args)
       })
     }
   }
