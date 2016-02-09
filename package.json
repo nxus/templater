@@ -1,8 +1,8 @@
 {
   "name": "@nxus/templater",
-  "version": "2.2.1",
+  "version": "2.2.2",
   "description": "The template manager for Nxus applications",
-  "main": "lib/Templater.js",
+  "main": "lib",
   "scripts": {
     "test": "NODE_ENV=test mocha --compilers js:babel/register -R spec",
     "compile": "babel --optional runtime -d lib/ src/",
@@ -24,12 +24,16 @@
     "glob": "^6.0.1"
   },
   "peerDependencies": {
-    "@nxus/core": "^2.2.0",
-    "@nxus/renderer": "^2.2.0"
+    "@nxus/core": "^2.3.0",
+    "@nxus/renderer": "^2.3.0"
   },
   "devDependencies": {
+    "@nxus/core": "^2.3.0",
     "babel": "^5.6.23",
+    "chai": "^3.4.1",
+    "chai-as-promised": "^5.1.0",
     "mocha": "^2.2.5",
-    "should": "^7.0.2"
+    "sails-memory": "^0.10.5",
+    "sinon": "^1.17.2"
   }
 }
