@@ -1,7 +1,7 @@
 /* 
 * @Author: Mike Reich
 * @Date:   2015-07-22 09:45:05
-* @Last Modified 2016-02-04
+* @Last Modified 2016-02-09
 */
 
 'use strict';
@@ -25,17 +25,18 @@ export default class Templater {
 
     this._templates = {}
 
-    app.get('templater').gather('template', this._register.bind(this));
-    app.get('templater').gather('templateDir', this._registerDir.bind(this));
-    app.get('templater').respond('render', this._render.bind(this));
-    app.get('templater').respond('renderPartial', this._renderPartial.bind(this));
+    app.get('templater').use(this)
+    .gather('template')
+    .gather('templateDir')
+    .respond('render')
+    .respond('renderPartial')
   }
 
-  _register(name, type, handler) {
+  template(name, type, handler) {
     this._templates[name] = {type, handler}
   }
 
-  _registerDir(type, dir, namespace = "") {
+  templateDir(type, dir, namespace = "") {
     var opts = {
       cwd: dir,
       dot: true,
@@ -54,7 +55,7 @@ export default class Templater {
     });
   }
 
-  _renderPartial(filePath, baseName, args = {}) {
+  renderPartial(filePath, baseName, args = {}) {
     if(fs.existsSync(filePath)) {
       if(!args.filename) args.filename = filePath
       return this.app.get('renderer').request('renderFile', filePath, args).then((content) => {
@@ -69,14 +70,14 @@ export default class Templater {
     }
   }
 
-  _render(name, args = {}) {
+  render(name, args = {}) {
     if(!this._templates[name]) throw new Error('Template name '+name+' not found')
     var opts = this._templates[name]
     if(typeof opts.handler === 'string') {
       args.filename = opts.handler
       return this.app.get('renderer').request('renderFile', opts.handler, args);
     } else { //assume its a callable returning a promise
-      return opts.handler(name, args).then((template) => {
+      return Promise.resolve(opts.handler(name, args)).then((template) => {
         return this.app.get('renderer').request('render', opts.type, template, args)
       })
     }

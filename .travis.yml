@@ -1,0 +1,14 @@
+language: node_js
+node_js:
+- '4.2'
+env:
+- CXX=g++-4.8
+addons:
+  apt:
+    sources:
+    - ubuntu-toolchain-r-test
+    packages:
+    - g++-4.8
+notifications:
+  slack:
+    secure: gweAR5L+oAWljbqfj+VT3GearRDysb3fFPTxpATGaihRmIflsueXHXL3ayRBNNm09X9nWwN9B4AUhuFxZ+P3nYlEGR5xtaHQQLRghO5RKKVngBksAakUY0sGmItc+lbRdMnR9YcfMBQFfL0RmCCYzVYl2CoWERNi+G0yCeKNsmbRQD90afwerhMFVgEX0w0lu6prez/ymfl702qzMboE3oMSQAgn44yZS3cjfvRIlfFCK/H66CMKnVHLOlIZTWDLl33QDdFmbLySNqa7EpageQJh4VqZxODMcPbw41gPj5jrqfr/NYeJ3EjU4nEyu6t2K7csbV4muuflxRIfCD+NWzYrjWgjoXIP1LxSh+vfVhHgm8uL8HDRr6gKkANBM4H9/mWIYv9ImWBZktaV5w/Tm/BdYfR3rTUadh6PksdHe1Nx946Jks4hBEY+xf1Y635FlEgLVucNtUt4xl4Pj88D7/WGlS3cAUUJfpDaZpi00d6A6DbK1HM2uRhNiiEh1Ar64AQy1shtK7xvK7C4VwFdEhPBCIUx5iW55p957RZO8tQJTWZqfnykBlf/c5SNItI2l48mqKH01XSjXu6WazlUQSq3yQvhyUoFPH++PA69WK5q6Ph3uumJ64bL/MYyDxZ60kXH1uzZ4UbkMt/W9gHUh3UqECGSEYMMUZR/hyKEbKQ=
