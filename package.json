@@ -1,6 +1,6 @@
 {
   "name": "@nxus/templater",
-  "version": "2.3.0",
+  "version": "2.3.1",
   "description": "The template manager for Nxus applications",
   "main": "lib",
   "scripts": {
