@@ -6,7 +6,10 @@
   "scripts": {
     "test": "NODE_ENV=test mocha --compilers js:babel/register -R spec",
     "compile": "babel --optional runtime -d lib/ src/",
-    "prepublish": "npm run compile"
+    "prepublish": "npm run compile",
+    "postpublish": "npm run docs-readme && npm run commit-update-docs",
+    "docs-readme": "export NAME=`npm view . name`; export VERSION=`npm view . version`; documentation readme ./src/*.js --name $NAME --project-version $VERSION --readme-file ./README.md -s $NAME",
+    "commit-update-docs": "git add ./README.md && git commit -m 'Updated README API Docs' && git push"
   },
   "repository": {
     "type": "git",
@@ -34,6 +37,7 @@
     "chai-as-promised": "^5.1.0",
     "mocha": "^2.2.5",
     "sails-memory": "^0.10.5",
+    "documentation": "^4.0.0-beta",
     "sinon": "^1.17.2"
   }
 }
