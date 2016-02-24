@@ -46,6 +46,17 @@ For example, given the following directory structure:
 
 Templater will expose `my-template` as a new template.
 
+Alternatively, you can supply a third argument that will be used to namespace the templates.
+
+    app.get('templater').templateDir('ejs', 'path/to/some/dir', 'custom')
+
+For example, given the following directory structure:
+
+    - /templates
+      |- my-template.ejs
+
+Templater will expose `custom-my-template` as a new template.
+
 #### Render content using a Template
 
     let opts = {content: "some content"}
@@ -75,3 +86,47 @@ Alternatively, you can specify a previously defined template as your partial:
 ## Templater
 
 Templater provides a template layer, built on top of the Nxus Renderer
+
+### render
+
+Renders a template
+
+**Parameters**
+
+-   `name` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** The name of the registered template to render
+-   `args` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)=(default {})** The arguments to pass to the template
+
+Returns **[Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)** A promise for the rendered content
+
+### renderPartial
+
+Renders the specified template as a partial, rendering the content in a parent template.
+
+**Parameters**
+
+-   `partial` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** Either a template name or a path to a partial file
+-   `filePath`  
+-   `baseName` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** The parent template to use to render the partial
+-   `args` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)=(default {})** The arguments to pass to the partial and the template for rendering
+
+Returns **[Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)** A promise for the rendered content.
+
+### template
+
+Define a new template
+
+**Parameters**
+
+-   `name` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** A name for the template
+-   `type` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** Templating engine used with the template. Should map to an installed `@nxus/renderer` type.
+-   `handler` **([string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)\|[function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function))** Either a filepath or a callback function which returns a promise that resolves to rendered content.
+
+### templateDir
+
+Convenience function to crawl a directory and register all matching files as a template.
+
+**Parameters**
+
+-   `type` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** File extension of files to import as templates
+-   `dir` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** The directory to crawl
+-   `namespace` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)=(default "")** An optional namespace to append to the front of the template name

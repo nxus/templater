@@ -1,7 +1,7 @@
 /* 
 * @Author: Mike Reich
 * @Date:   2015-07-22 09:45:05
-* @Last Modified 2016-02-20
+* @Last Modified 2016-02-24
 */
 /**
  * [![Build Status](https://travis-ci.org/nxus/templater.svg?branch=master)](https://travis-ci.org/nxus/templater)
@@ -47,6 +47,17 @@
  *       |- my-template.ejs
  * 
  * Templater will expose `my-template` as a new template.
+ *
+ * Alternatively, you can supply a third argument that will be used to namespace the templates.
+ *
+ *     app.get('templater').templateDir('ejs', 'path/to/some/dir', 'custom')
+ * 
+ * For example, given the following directory structure:
+ * 
+ *     - /templates
+ *       |- my-template.ejs
+ * 
+ * Templater will expose `custom-my-template` as a new template.
  * 
  * ### Render content using a Template
  * 
@@ -105,11 +116,23 @@ export default class Templater {
     .respond('renderPartial')
   }
 
+  /**
+   * Define a new template
+   * @param  {string} name    A name for the template
+   * @param  {string} type    Templating engine used with the template. Should map to an installed `@nxus/renderer` type.
+   * @param  {string|function} handler Either a filepath or a callback function which returns a promise that resolves to rendered content.
+   */
   template(name, type, handler) {
     this.app.log.debug('Registering template', name)
     this._templates[name] = {type, handler}
   }
 
+  /**
+   * Convenience function to crawl a directory and register all matching files as a template.
+   * @param  {string} type      File extension of files to import as templates
+   * @param  {string} dir       The directory to crawl
+   * @param  {String} namespace An optional namespace to append to the front of the template name
+   */
   templateDir(type, dir, namespace = "") {
     var opts = {
       cwd: dir,
@@ -129,6 +152,13 @@ export default class Templater {
     });
   }
 
+  /**
+   * Renders the specified template as a partial, rendering the content in a parent template.
+   * @param  {string} partial Either a template name or a path to a partial file
+   * @param  {string} baseName The parent template to use to render the partial
+   * @param  {Object} args     The arguments to pass to the partial and the template for rendering
+   * @return {Promise}          A promise for the rendered content.
+   */
   renderPartial(filePath, baseName, args = {}) {
     if(fs.existsSync(filePath)) {
       if(!args.filename) args.filename = filePath
@@ -144,6 +174,12 @@ export default class Templater {
     }
   }
 
+  /**
+   * Renders a template
+   * @param  {string} name The name of the registered template to render
+   * @param  {Object} args The arguments to pass to the template
+   * @return {Promise}      A promise for the rendered content
+   */
   render(name, args = {}) {
     if(!this._templates[name]) throw new Error('Template name '+name+' not found')
     var opts = this._templates[name]
