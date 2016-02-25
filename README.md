@@ -87,6 +87,22 @@ Alternatively, you can specify a previously defined template as your partial:
 
 Templater provides a template layer, built on top of the Nxus Renderer
 
+### getTemplate
+
+Returns the specified template if it exists
+
+**Parameters**
+
+-   `name` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** The name of the template.
+
+Returns **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** A template object, with `type` and `handler` attributes.
+
+### getTemplates
+
+Returns all registered templates
+
+Returns **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** An array of template object, with `type` and `handler` attributes.
+
 ### render
 
 Renders a template
