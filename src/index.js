@@ -1,7 +1,7 @@
 /* 
 * @Author: Mike Reich
 * @Date:   2015-07-22 09:45:05
-* @Last Modified 2016-02-24
+* @Last Modified 2016-02-25
 */
 /**
  * [![Build Status](https://travis-ci.org/nxus/templater.svg?branch=master)](https://travis-ci.org/nxus/templater)
@@ -114,6 +114,8 @@ export default class Templater {
     .gather('templateDir')
     .respond('render')
     .respond('renderPartial')
+    .respond('getTemplate')
+    .respond('getTemplates')
   }
 
   /**
@@ -150,6 +152,23 @@ export default class Templater {
         this.template(namespace+name, type, dir+"/"+file)
       })
     });
+  }
+
+  /**
+   * Returns the specified template if it exists
+   * @param  {String} name The name of the template.
+   * @return {Object}      A template object, with `type` and `handler` attributes.
+   */
+  getTemplate(name) {
+    return this._templates[name]
+  }
+
+  /**
+   * Returns all registered templates
+   * @return {Object}      An array of template object, with `type` and `handler` attributes.
+   */
+  getTemplates() {
+    return this._templates
   }
 
   /**
