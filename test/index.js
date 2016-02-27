@@ -1,7 +1,7 @@
 /* 
 * @Author: Mike Reich
 * @Date:   2015-12-06 07:20:10
-* @Last Modified 2016-02-09
+* @Last Modified 2016-02-26
 */
 
 'use strict';
@@ -67,17 +67,6 @@ describe("Templater", () => {
       app.emit('load').then(() => {
         chai.should().exist(templater._templates['test'])
         done()
-      })
-    })
-  })
-
-  describe("Render Content", () => {
-    it('call the passed render function', (done) => {
-      templater.template('test', 'test', () => {})
-      app.emit('load').then(() => {
-        templater.render('test', {}).then(() => {
-          done()
-        })
       })
     })
   })
