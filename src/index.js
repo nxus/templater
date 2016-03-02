@@ -80,6 +80,12 @@
  *     app.get('templater').renderPartial('partial-template', 'wrapper-template', opts).then((content) => {
  *       console.log('rendered partial content', content)l
  *     })
+ *
+ * ### Render a partial within a template
+ *
+ * In place of EJS' `include` function for rendering sub-templates, you can use the `render` function to use a templater-registered template name within a template:
+ * 
+ *    <%- render('app-nav`) %>
  * 
  * # API
  * -----
