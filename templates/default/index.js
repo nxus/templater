@@ -9,9 +9,9 @@
 module.exports = function(app){
   var templater = app.get('templater')
 
-  templater.provide('templateDir', "ejs", __dirname);
+  templater.templateDir("ejs", __dirname);
 
-  app.get('router').provide('static', "/dist", __dirname+"/dist")
-  app.get('router').provide('static', "/js", __dirname+"/js")
-  app.get('router').provide('static', "/bower_components", __dirname+"/bower_components")
+  app.get('router').default().static("/dist", __dirname+"/dist")
+  app.get('router').default().static("/js", __dirname+"/js")
+  app.get('router').default().static("/bower_components", __dirname+"/bower_components")
 }

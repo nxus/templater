@@ -90,6 +90,8 @@
 require('babel-runtime/core-js/promise').default = require('bluebird');
 import fs from 'fs';
 import glob from 'glob';
+import uuid from 'node-uuid'
+import _ from 'underscore'
 
 import Promise from 'bluebird';
 var globAsync = Promise.promisify(glob);
@@ -112,10 +114,13 @@ export default class Templater {
     app.get('templater').use(this)
     .gather('template')
     .gather('templateDir')
-    .respond('render')
     .respond('renderPartial')
+    .respond('render')
     .respond('getTemplate')
     .respond('getTemplates')
+
+    app.get('renderer').before('render', this.locals.bind(this))
+    app.get('renderer').after('render', this.localsAfter.bind(this))
   }
 
   /**
@@ -210,5 +215,36 @@ export default class Templater {
         return this.app.get('renderer').render(opts.type, template, args)
       })
     }
+  }
+
+  locals([type, content, opts]) {
+    if (!opts.render) {
+      opts.render = (name, newOpts) => {
+        if (!newOpts) {
+          newOpts = _.extend({}, opts)
+        }
+        if (!opts._renderedPartials) {
+          opts._renderedPartials = {}
+        }
+        let id = uuid.v4()
+        opts._renderedPartials[id] = this.render(name, newOpts)
+        return "<<<"+id+">>>"
+      }
+    }
+    return [type, content, opts]
+  }
+  
+  localsAfter(result, [type, content, opts]) {
+    if (opts._renderedPartials) {
+      return Promise.mapSeries(_.keys(opts._renderedPartials), (id) => {
+        return opts._renderedPartials[id].then((part) => {
+          result = result.replace('<<<'+id+'>>>', part)
+          return result
+        })
+      }).then(() => {
+        return result
+      })
+    }
+    return result
   }
 }
