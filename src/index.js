@@ -158,9 +158,9 @@ export default class Templater {
     let pattern = "*."+type
 
     return globAsync(pattern, opts).then((files) => {
-      files.forEach((file) => {
+      return Promise.map(files, (file) => {
         var name = file.replace("."+type, "")
-        this.template(namespace+name, type, dir+"/"+file)
+        return this.provide('template', namespace+name, type, dir+"/"+file)
       })
     });
   }
