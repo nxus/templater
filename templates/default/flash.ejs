@@ -1,5 +1,5 @@
                 <% if(typeof req != 'undefined') { %>
-                <% var messages = req.flash(); console.log('messages', messages); %>
+                <% var messages = req.flash(); %>
                 <% if (messages.error && messages.error.length > 0) { %>
                 <% messages.error.forEach(function(flash) { %>
                     <div class="alert-dismissable alert alert-danger">
