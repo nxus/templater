@@ -39,7 +39,7 @@
  * 
  * Alternatively, you can register a directory. Templater will define a new template for every file in the directory with the specified type extension.
  * 
- *     app.get('templater').templateDir('ejs', 'path/to/some/dir')
+ *     app.get('templater').templateDir('path/to/some/dir')
  * 
  * For example, given the following directory structure:
  * 
@@ -47,10 +47,10 @@
  *       |- my-template.ejs
  * 
  * Templater will expose `my-template` as a new template.
- *
+ * 
  * Alternatively, you can supply a third argument that will be used to namespace the templates.
  *
- *     app.get('templater').templateDir('ejs', 'path/to/some/dir', 'custom')
+ *     app.get('templater').templateDir('path/to/some/dir', 'custom')
  * 
  * For example, given the following directory structure:
  * 
@@ -59,6 +59,10 @@
  * 
  * Templater will expose `custom-my-template` as a new template.
  * 
+ * You may pass an optional `type` parameter to templateDir to only include files with that extension.
+ *
+ *     app.get('templater').templateDir('path/to/some/dir', 'custom', 'ejs')
+ *
  * ### Render content using a Template
  * 
  *     let opts = {content: "some content"}
@@ -93,14 +97,15 @@
 
 'use strict';
 
-require('babel-runtime/core-js/promise').default = require('bluebird');
-import fs from 'fs';
-import glob from 'glob';
+require('babel-runtime/core-js/promise').default = require('bluebird')
+import fs from 'fs'
+import path from 'path'
+import glob from 'glob'
 import uuid from 'node-uuid'
 import _ from 'underscore'
 
-import Promise from 'bluebird';
-var globAsync = Promise.promisify(glob);
+import Promise from 'bluebird'
+var globAsync = Promise.promisify(glob)
 
 import DefaultTemplate from '../templates/default'
 
@@ -132,11 +137,16 @@ export default class Templater {
   /**
    * Define a new template
    * @param  {string} name    A name for the template
-   * @param  {string} type    Templating engine used with the template. Should map to an installed `@nxus/renderer` type.
+   * @param  {string} [type]    Templating engine used with the template. Should map to an installed `@nxus/renderer` type. Optional if handler is a filepath with extension
    * @param  {string|function} handler Either a filepath or a callback function which returns a promise that resolves to rendered content.
    */
   template(name, type, handler) {
     this.app.log.debug('Registering template', name)
+    // Handle optional type parameter
+    if (handler === undefined && _.isString(type)) {
+      handler = type
+      type = path.extname(type).replace(".", "")
+    }
     this._templates[name] = {type, handler}
   }
 
@@ -146,25 +156,39 @@ export default class Templater {
    * @param  {string} dir       The directory to crawl
    * @param  {String} namespace An optional namespace to append to the front of the template name
    */
-  templateDir(type, dir, namespace = "") {
+  templateDir(dir, namespace = "", type="*") {
     var opts = {
       cwd: dir,
       dot: true,
       mark: true
     }
 
-    if(namespace.length > 0) namespace = namespace+"-"
+    // Handle optional type parameter
+    if (dir === undefined) {
+      dir = type
+      type = '*'
+    }
+
+    if (namespace.length > 0) namespace = namespace+"-"
 
     let pattern = "*."+type
 
     return globAsync(pattern, opts).then((files) => {
       return Promise.map(files, (file) => {
-        var name = file.replace("."+type, "")
-        return this.provide('template', namespace+name, type, dir+"/"+file)
+        let ext = type
+        if (ext == '*') {
+          ext = this._typeFromFile(file)
+        }
+        var name = file.replace("."+ext, "")
+        return this.provide('template', namespace+name, ext, dir+"/"+file)
       })
     });
   }
 
+  _typeFromFile(filename) {
+    return path.extname(filename).replace(".", "")
+  }
+  
   /**
    * Returns the specified template if it exists
    * @param  {String} name The name of the template.

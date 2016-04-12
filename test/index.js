@@ -70,4 +70,25 @@ describe("Templater", () => {
       })
     })
   })
+
+  describe("Registering templates with template()", () => {
+    it("should accept just a filename", () => {
+      templater.template("path/to/filename.ejs")
+      templater._templates.should.have.property("filename", {type: 'ejs', handler: 'path/to/filename.ejs'})
+    })
+    it("should accept just a name and filename", () => {
+      templater.template("defaultFilename", "path/to/filename.ejs")
+      templater._templates.should.have.property("defaultFilename", {type: 'ejs', handler: 'path/to/filename.ejs'})
+    })
+    it("should accept all and path", () => {
+      let handler = () => {}
+      templater.template("filename", "path/to/filename.txt", "custom", 'ejs')
+      templater._templates.should.have.property("custom-filename", {type: 'ejs', handler: 'path/to/filename.txt'})
+    })
+    it("should accept all and handler", () => {
+      let handler = () => {}
+      templater.template("handler", handler, "custom", "ejs")
+      templater._templates.should.have.property("custom-handler", {type: 'ejs', handler: handler})
+    })
+  })
 });
