@@ -35,6 +35,16 @@
  *     }
  *     app.get('templater').template('default', 'ejs', handler)
  * 
+ * ### Register a Template File
+ * 
+ * As a shorthand for a file-based template, whose type is the file extension, you can use
+ * 
+ *     app.get('templater').templateFile('default', 'path/to/some/file.ejs')
+ * 
+ * And in the common case where the filename is the desired template name, even shorter:
+ * 
+ *     app.get('templater').templateFile('path/to/some/default.ejs')
+ * 
  * ### Registering a Template Directory
  * 
  * Alternatively, you can register a directory. Templater will define a new template for every file in the directory with the specified type extension.
@@ -142,14 +152,24 @@ export default class Templater {
    */
   template(name, type, handler) {
     this.app.log.debug('Registering template', name)
-    // Handle optional type parameter
-    if (handler === undefined && _.isString(type)) {
-      handler = type
-      type = path.extname(type).replace(".", "")
-    }
     this._templates[name] = {type, handler}
   }
 
+  /**
+   * Define a new template from a filename
+   * @param  {string} name    A name for the template
+   * @param  {string} [filepath] Path to file to use as template
+   */
+  templateFile(name, handler) {
+
+    if (handler === undefined) {
+      handler = name
+      name = path.basename(handler).split(".")[0]
+    }
+    let type = path.extname(handler).replace(".", "")
+    this.template(name, type, handler)
+  }
+  
   /**
    * Convenience function to crawl a directory and register all matching files as a template.
    * @param  {string} type      File extension of files to import as templates
@@ -161,12 +181,6 @@ export default class Templater {
       cwd: dir,
       dot: true,
       mark: true
-    }
-
-    // Handle optional type parameter
-    if (dir === undefined) {
-      dir = type
-      type = '*'
     }
 
     if (namespace.length > 0) namespace = namespace+"-"
