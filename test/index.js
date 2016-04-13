@@ -41,6 +41,13 @@ describe("Templater", () => {
       });
     })
 
+    it("should register a gather for templateFile", () => {
+      return app.emit('load').then(() => {
+        app.get.calledWith('templater').should.be.true;
+        app.get().gather.calledWith('templateFile').should.be.true;
+      });
+    })
+    
     it("should register a gather for templateDirs", () => {
       return app.emit('load').then(() => {
         app.get.calledWith('templater').should.be.true;
@@ -92,6 +99,19 @@ describe("Templater", () => {
         chai.should().exist(templater._templates['test'])
         done()
       })
+    })
+  })
+
+  describe("Registering templates with templateFile()", () => {
+    it("should accept just a filename", () => {
+      templater.templateFile("path/to/filename.ejs")
+      templater._templates.should.have.property("filename")
+      templater._templates.filename.should.eql({type: 'ejs', handler: 'path/to/filename.ejs'})
+    })
+    it("should accept just a name and filename", () => {
+      templater.templateFile("defaultFilename", "path/to/filename.ejs")
+      templater._templates.should.have.property("defaultFilename")
+      templater._templates.defaultFilename.should.eql({type: 'ejs', handler: 'path/to/filename.ejs'})
     })
   })
 });
