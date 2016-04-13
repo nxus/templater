@@ -195,6 +195,7 @@ export default class Templater {
   /**
    * Renders a template
    * @param  {string} name The name of the registered template to render
+   * @param  {string} [basename] A parent template name to render into as contents
    * @param  {Object} args The arguments to pass to the template
    * @return {Promise}      A promise for the rendered content
    */
