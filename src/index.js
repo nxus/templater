@@ -200,7 +200,7 @@ export default class Templater {
    */
   render(name, basename = '', args = {}) {
     if(!this._templates[name]) throw new Error('Template name '+name+' not found')
-    if(args === undefined && !_.isString(basename)) {
+    if(_.isEmpty(args) && !_.isString(basename)) {
       args = basename
       basename = ''
     }
@@ -209,7 +209,7 @@ export default class Templater {
       return this._render(name, args).then((content) => {
         if (basename.length > 0) {
           args.content = content
-          return this.render(baseName, args)
+          return this.render(basename, args)
         } else {
           return content
         }
