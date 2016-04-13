@@ -53,14 +53,38 @@ describe("Templater", () => {
         app.get().respond.calledWith('render').should.be.true;
       });
     })
-
-    it("should register a provider for renderPartial", () => {
-      return app.emit('load').then(() => {
-        app.get().respond.calledWith('renderPartial').should.be.true;
-      });
-    })
   });
 
+  describe("_mergeArgs", () => {
+    it("should handle null and single-length", () => {
+      let r = templater._mergeArgs({})
+      r.should.eql({})
+      r = templater._mergeArgs({}, {})
+      r.should.eql({})
+    })
+    it("should merge objects", () => {
+      let r = templater._mergeArgs({a: 1}, {b: 2})
+      r.should.have.property("a", 1)
+      r.should.have.property("b", 2)
+    })
+    it("should merge array of objects", () => {
+      let r = templater._mergeArgs({a: 1}, [{b: 2}, {c: 3}])
+      r.should.have.property("a", 1)
+      r.should.have.property("b", 2)
+      r.should.have.property("c", 3)
+    })
+    it("should concat for array values", () => {
+      let r = templater._mergeArgs({a: [1]}, [{a: [2]}, {a: 3}])
+      r.should.have.property("a")
+      r.a.should.eql([1, 2, 3])
+    })
+    it("should uniq for array values", () => {
+      let r = templater._mergeArgs({a: [1]}, [{a: [1]}, {a: 3}])
+      r.should.have.property("a")
+      r.a.should.eql([1, 3])
+    })
+  })
+  
   describe("Register Renderer", () => {
     it("should register a renderer with the specified type", (done) => {
       templater.template('test', 'test', () => {})

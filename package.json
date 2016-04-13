@@ -30,7 +30,7 @@
   },
   "peerDependencies": {
     "@nxus/core": "^2.4.0-0",
-    "@nxus/renderer": "^2.4.0-0"
+    "@nxus/renderer": "^2.4.0-1"
   },
   "devDependencies": {
     "@nxus/core": "^2.4.0-0",

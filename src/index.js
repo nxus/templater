@@ -67,25 +67,36 @@
  *       console.log('rendered content', content)
  *     })
  * 
- * ### Render a partial using a Template
+ * ### Render a Template as the contents of another Template
  * 
- * If you've defined a partial you would like wrapped in another template, use the `renderPartial` request and specify a template in which the partial will be wrapped.
+ * If you've defined a partial template you would like wrapped in another template, use the `render` request and specify a template in which the partial will be wrapped as `contents`.
  * 
- *     app.get('templater').renderPartial('path/to/my/partial', 'wrapper-template', opts).then((content) => {
- *       console.log('rendered partial content', content)l
- *     })
- * 
- * Alternatively, you can specify a previously defined template as your partial:
- * 
- *     app.get('templater').renderPartial('partial-template', 'wrapper-template', opts).then((content) => {
- *       console.log('rendered partial content', content)l
+ *     app.get('templater').render('partial-template', 'wrapper-template', opts).then((content) => {
+ *       console.log('rendered complete content', content)l
  *     })
  *
- * ### Render a partial within a template
+ * ### Render a partial from within a template
  *
  * In place of EJS' `include` function for rendering sub-templates, you can use the `render` function to use a templater-registered template name within a template:
  * 
  *    <%- render('app-nav`) %>
+ * 
+ * ### Provide additional context opts for rendering (scripts, etc)
+ * 
+ * Modules can provide additional context options to be available to templates. :
+ * 
+ *     app.get('templater').on('templateContext', () => {return {username: 'Steve'}})
+ * 
+ * The event handler is passed the original template name and args, so if `req` or other is provided it is available to you, or if you want to only provide context for some templates, but you do not need to return the whole modified args:
+ * 
+ *     app.get('templater').on('templateContext', (name, args) => {return {username: args.req ? args.req.user : '' }})
+ * 
+ * Values that are arrays are treated specially, so that for instance `scripts` can collect script URLs from many modules:
+ * 
+ *     app.get('templater').on('templateContext', () => {return {scripts: ['/url/script.js']}})
+ *     app.get('templater').on('templateContext', () => {return {scripts: ['/url/other.js']}})
+ * 
+ * Will result in `scripts` containing an array with both these values. The list will be filtered to only have unique values, so you can specify scripts in dependency order and not worry if other modules are asking for the same common js files repeatedly. The default set of templates provided by this module include rendering of this `scripts` variable automatically.
  * 
  * # API
  * -----
@@ -120,7 +131,6 @@ export default class Templater {
     app.get('templater').use(this)
     .gather('template')
     .gather('templateDir')
-    .respond('renderPartial')
     .respond('render')
     .respond('getTemplate')
     .respond('getTemplates')
@@ -183,35 +193,32 @@ export default class Templater {
   }
 
   /**
-   * Renders the specified template as a partial, rendering the content in a parent template.
-   * @param  {string} partial Either a template name or a path to a partial file
-   * @param  {string} baseName The parent template to use to render the partial
-   * @param  {Object} args     The arguments to pass to the partial and the template for rendering
-   * @return {Promise}          A promise for the rendered content.
-   */
-  renderPartial(filePath, baseName, args = {}) {
-    if(fs.existsSync(filePath)) {
-      if(!args.filename) args.filename = filePath
-      return this.app.get('renderer').renderFile(filePath, args).then((content) => {
-        args.content = content
-        return this.render(baseName, args)
-      })
-    } else {
-      return this.render(filePath, args).then((content) => {
-        args.content = content
-        return this.render(baseName, args)
-      })
-    }
-  }
-
-  /**
    * Renders a template
    * @param  {string} name The name of the registered template to render
+   * @param  {string} [basename] A parent template name to render into as contents
    * @param  {Object} args The arguments to pass to the template
    * @return {Promise}      A promise for the rendered content
    */
-  render(name, args = {}) {
+  render(name, basename = '', args = {}) {
     if(!this._templates[name]) throw new Error('Template name '+name+' not found')
+    if(_.isEmpty(args) && !_.isString(basename)) {
+      args = basename
+      basename = ''
+    }
+    return this.emit('templateContext', name, args).then((newArgs) => {
+      args = this._mergeArgs(args, newArgs)
+      return this._render(name, args).then((content) => {
+        if (basename.length > 0) {
+          args.content = content
+          return this.render(basename, args)
+        } else {
+          return content
+        }
+      })
+    })
+  }
+
+  _render(name, args) {
     var opts = this._templates[name]
     if(typeof opts.handler === 'string') {
       args.filename = opts.handler
@@ -221,8 +228,30 @@ export default class Templater {
         return this.app.get('renderer').render(opts.type, template, args)
       })
     }
+    
   }
 
+  _mergeArgs(oldArgs, newArgs) {
+    let args = {}
+    // undo Dispatcher._squashArrayResults
+    if (newArgs === undefined) {
+      newArgs = []
+    } else if (!_.isArray(newArgs)) {
+      newArgs = [newArgs]
+    }
+    for (let arg of [].concat(oldArgs, newArgs)) {
+      for (let key in arg) {
+        let val = arg[key]
+        if (_.isArray(args[key])) {
+          args[key] = _.uniq(args[key].concat(val))
+        } else {
+          args[key] = val
+        }
+      }
+    }
+    return args
+  }
+  
   locals([type, content, opts]) {
     if (!opts.render) {
       opts.render = (name, newOpts) => {
