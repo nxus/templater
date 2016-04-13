@@ -134,6 +134,7 @@ export default class Templater {
 
     app.get('templater').use(this)
     .gather('template')
+    .gather('templateFile')
     .gather('templateDir')
     .respond('renderPartial')
     .respond('render')

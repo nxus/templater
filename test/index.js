@@ -41,6 +41,13 @@ describe("Templater", () => {
       });
     })
 
+    it("should register a gather for templateFile", () => {
+      return app.emit('load').then(() => {
+        app.get.calledWith('templater').should.be.true;
+        app.get().gather.calledWith('templateFile').should.be.true;
+      });
+    })
+    
     it("should register a gather for templateDirs", () => {
       return app.emit('load').then(() => {
         app.get.calledWith('templater').should.be.true;
