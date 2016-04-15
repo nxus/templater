@@ -13,7 +13,7 @@
      <script src="/bower_components/morrisjs/morris.min.js"></script>
     <!-- Custom Theme JavaScript -->
      <script src="/dist/js/sb-admin-2.js"></script>
-     <% if (scripts && scripts.length) { %>
+     <% if (typeof scripts != 'undefined' && scripts.length) { %>
        <% scripts.forEach(function(script) { %>
      <script src="<%=script%>"></script>
        <% }) %>
