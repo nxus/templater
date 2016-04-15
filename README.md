@@ -22,22 +22,23 @@ All templates share a single namespace, so its a good idea to add a prefix to yo
 
 #### Register a Template
 
+There are three types of templates you can register.
+
+##### Template File
+
 If you would like to register a single template, you can use the template provider and specify a file:
 
-    app.get('templater').template('default', 'ejs', 'path/to/some/file')
+    app.get('templater').template('path/to/some/file.ejs')
 
-You can also pass in a handler method instead of a file path. Templater expects that this handler returns a string with the template content, or a Promise that resolves to a string. The handler will be passed in the name of the template requested, as well as any render options specified.
+Based on the filename, the template will be given the name `file` and rendered using the EJS renderer.
 
-    var handler = function(name, args) {
-      return "<html>.....";
-    }
-    app.get('templater').template('default', 'ejs', handler)
+Optionally, you can specify another template to wrap the output (for partial style templates).
 
-#### Registering a Template Directory
+    app.get('templater').template('path/to/some/file.ejs', 'page')
 
-Alternatively, you can register a directory. Templater will define a new template for every file in the directory with the specified type extension.
+##### Template Directory
 
-    app.get('templater').templateDir('ejs', 'path/to/some/dir')
+Alternatively, if you have a folder with all your templates, you can add them all using `templateDir`.
 
 For example, given the following directory structure:
 
@@ -46,16 +47,22 @@ For example, given the following directory structure:
 
 Templater will expose `my-template` as a new template.
 
-Alternatively, you can supply a third argument that will be used to namespace the templates.
+     app.get('templater').template('path/to/some/dir/')
 
-    app.get('templater').templateDir('ejs', 'path/to/some/dir', 'custom')
+Each template will be processed using the `template` function above.  You can also specify a wrapper template.
 
-For example, given the following directory structure:
+     app.get('templater').template('path/to/some/dir/', 'page')
 
-    - /templates
-      |- my-template.ejs
+##### Function
 
-Templater will expose `custom-my-template` as a new template.
+You can also pass in a handler method instead of a file path. Templater expects that this handler returns a string with the rendered content, or a Promise that resolves to a string. 
+
+The handler will be passed in the name of the template requested, as well as any render options specified.
+
+    var handler = function(args, name) {
+      return "<html>.....";
+    }
+    app.get('templater').template('default', handler)
 
 #### Render content using a Template
 
@@ -65,19 +72,45 @@ Templater will expose `custom-my-template` as a new template.
       console.log('rendered content', content)
     })
 
-#### Render a partial using a Template
+#### Override the template wrapper
 
-If you've defined a partial you would like wrapped in another template, use the `renderPartial` request and specify a template in which the partial will be wrapped.
+If you want to specify a different wrapper template than was originally set, you can add a `template` key to the opts object.
 
-    app.get('templater').renderPartial('path/to/my/partial', 'wrapper-template', opts).then((content) => {
-      console.log('rendered partial content', content)l
+    opts.template = 'new-template'
+    app.get('templater').render('partial-template', opts).then((content) => {
+      console.log('rendered complete content', content)l
     })
 
-Alternatively, you can specify a previously defined template as your partial:
+#### Render a partial from within a template
 
-    app.get('templater').renderPartial('partial-template', 'wrapper-template', opts).then((content) => {
-      console.log('rendered partial content', content)l
-    })
+In place of EJS' `include` function for rendering sub-templates, you can use the `render` function to use a templater-registered template name within a template:
+
+   &lt;%- render('app-nav\`) %>
+
+or with specific options
+
+   &lt;%- render('app-nav', navItems) %>
+
+#### Provide additional context opts for rendering (scripts, etc)
+
+Modules can provide additional context options to be available to templates. :
+
+    app.get('templater').on('renderContext', () => {return {username: 'Steve'}})
+
+The event handler is passed the original template name and args, so if `req` or other is provided it is available to you, or if you want to only provide context for some templates, but you do not need to return the whole modified args:
+
+    app.get('templater').on('templateContext', (args, name) => {return {username: args.req ? args.req.user : '' }})
+
+Templater will also fire a template specific event
+
+    app.get('templater').on('renderContext.my-template', () => {return {username: 'Steve'}}) 
+
+Values that are arrays are concated rather than overwritten, so that for instance `scripts` can collect script URLs from many modules:
+
+    app.get('templater').on('renderContext', () => {return {scripts: ['/url/script.js']}})
+    app.get('templater').on('renderContext', () => {return {scripts: ['/url/other.js']}})
+
+Will result in `scripts` containing an array with both these values. The list will be filtered to only have unique values, so you can specify scripts in dependency order and not worry if other modules are asking for the same common js files repeatedly. The default set of templates provided by this module include rendering of this `scripts` variable automatically.
 
 ## API
 
@@ -102,47 +135,3 @@ Returns **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Refer
 Returns all registered templates
 
 Returns **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** An array of template object, with `type` and `handler` attributes.
-
-### render
-
-Renders a template
-
-**Parameters**
-
--   `name` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** The name of the registered template to render
--   `args` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)=(default {})** The arguments to pass to the template
-
-Returns **[Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)** A promise for the rendered content
-
-### renderPartial
-
-Renders the specified template as a partial, rendering the content in a parent template.
-
-**Parameters**
-
--   `partial` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** Either a template name or a path to a partial file
--   `filePath`  
--   `baseName` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** The parent template to use to render the partial
--   `args` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)=(default {})** The arguments to pass to the partial and the template for rendering
-
-Returns **[Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)** A promise for the rendered content.
-
-### template
-
-Define a new template
-
-**Parameters**
-
--   `name` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** A name for the template
--   `type` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** Templating engine used with the template. Should map to an installed `@nxus/renderer` type.
--   `handler` **([string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)\|[function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function))** Either a filepath or a callback function which returns a promise that resolves to rendered content.
-
-### templateDir
-
-Convenience function to crawl a directory and register all matching files as a template.
-
-**Parameters**
-
--   `type` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** File extension of files to import as templates
--   `dir` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** The directory to crawl
--   `namespace` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)=(default "")** An optional namespace to append to the front of the template name
