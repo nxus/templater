@@ -1,7 +1,7 @@
 /* 
 * @Author: Mike Reich
 * @Date:   2015-12-06 07:20:10
-* @Last Modified 2016-02-26
+* @Last Modified 2016-04-16
 */
 
 'use strict';
@@ -44,7 +44,7 @@ describe("Templater", () => {
     it("should register a gather for templateFile", () => {
       return app.emit('load').then(() => {
         app.get.calledWith('templater').should.be.true;
-        app.get().gather.calledWith('templateFile').should.be.true;
+        app.get().gather.calledWith('templateFunction').should.be.true;
       });
     })
     
@@ -81,12 +81,12 @@ describe("Templater", () => {
       r.should.have.property("c", 3)
     })
     it("should concat for array values", () => {
-      let r = templater._mergeArgs({a: [1]}, [{a: [2]}, {a: 3}])
+      let r = templater._mergeArgs({a: [1]}, {a: [2, 3]})
       r.should.have.property("a")
       r.a.should.eql([1, 2, 3])
     })
     it("should uniq for array values", () => {
-      let r = templater._mergeArgs({a: [1]}, [{a: [1]}, {a: 3}])
+      let r = templater._mergeArgs({a: [1]}, {a: [1, 3]})
       r.should.have.property("a")
       r.a.should.eql([1, 3])
     })
@@ -94,7 +94,7 @@ describe("Templater", () => {
   
   describe("Register Renderer", () => {
     it("should register a renderer with the specified type", (done) => {
-      templater.template('test', 'test', () => {})
+      templater.template('test', () => {})
       app.emit('load').then(() => {
         chai.should().exist(templater._templates['test'])
         done()
@@ -102,16 +102,17 @@ describe("Templater", () => {
     })
   })
 
-  describe("Registering templates with templateFile()", () => {
+  describe("Registering templates with template()", () => {
     it("should accept just a filename", () => {
-      templater.templateFile("path/to/filename.ejs")
+      templater.template("path/to/filename.ejs")
       templater._templates.should.have.property("filename")
-      templater._templates.filename.should.eql({type: 'ejs', handler: 'path/to/filename.ejs'})
+      templater._templates.filename.filename.should.eql('path/to/filename.ejs')
     })
     it("should accept just a name and filename", () => {
-      templater.templateFile("defaultFilename", "path/to/filename.ejs")
-      templater._templates.should.have.property("defaultFilename")
-      templater._templates.defaultFilename.should.eql({type: 'ejs', handler: 'path/to/filename.ejs'})
+      templater.template("path/to/filename.ejs", 'default')
+      templater._templates.should.have.property("filename")
+      templater._templates.filename.filename.should.eql('path/to/filename.ejs')
+      templater._templates.filename.wrapper.should.eql('default')
     })
   })
 });

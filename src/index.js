@@ -1,7 +1,7 @@
 /* 
 * @Author: Mike Reich
 * @Date:   2015-07-22 09:45:05
-* @Last Modified 2016-04-15
+* @Last Modified 2016-04-16
 */
 /**
  * [![Build Status](https://travis-ci.org/nxus/templater.svg?branch=master)](https://travis-ci.org/nxus/templater)
@@ -245,6 +245,12 @@ export default class Templater {
   }
 
   _mergeArgs(oldArgs, newArgs) {
+    if(_.isArray(newArgs)) {
+      newArgs.forEach((a) => {
+        oldArgs = this._mergeArgs(oldArgs, a)
+      })
+      return oldArgs
+    }
     _.each(newArgs, (value, key) => {
       if (_.isArray(value) && _.isArray(oldArgs[key])) {
         oldArgs[key] = _.uniq(oldArgs[key].concat(value))
