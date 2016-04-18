@@ -157,8 +157,10 @@ export default class Templater {
     app.get('renderer').after('render', this.localsAfter.bind(this))
   }
 
-  template(filename, wrapper) {
-    let name = path.basename(filename).split(".")[0]
+  template(filename, wrapper, name=null) {
+    if (name === null) {
+      name = path.basename(filename).split(".")[0]
+    }
     this.app.log('registering template', name)
     this._templates[name] = {filename, wrapper}
   }
