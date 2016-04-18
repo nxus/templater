@@ -16,6 +16,7 @@ module.exports = function(app){
   templater.default().template(__dirname+'/404.ejs');
   templater.default().template(__dirname+'/500.ejs');
   templater.default().template(__dirname+'/scripts.ejs');
+  templater.default().template(__dirname+'/scripts_include.ejs');
 
   app.get('router').default().static("/dist", __dirname+"/dist")
   app.get('router').default().static("/js", __dirname+"/js")
