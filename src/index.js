@@ -1,7 +1,7 @@
 /* 
 * @Author: Mike Reich
 * @Date:   2015-07-22 09:45:05
-* @Last Modified 2016-04-16
+* @Last Modified 2016-04-26
 */
 /**
  * [![Build Status](https://travis-ci.org/nxus/templater.svg?branch=master)](https://travis-ci.org/nxus/templater)
@@ -226,13 +226,13 @@ export default class Templater {
 
   _render(name, args = {}) {
     var opts = this._templates[name]
-    var promise;
+    var promise = Promise.resolve();
 
     if(opts.filename){
       args.filename = opts.filename
       promise = this.app.get('renderer').renderFile(opts.filename, args)
     }
-     
+    
     if(opts.handler)
       promise = Promise.resolve(opts.handler(args, name))
 
@@ -242,8 +242,8 @@ export default class Templater {
       return promise.then((content) => {
         return this.render(template, Object.assign(args, {content}))
       })
-    } else
-      return promise
+    } 
+    return promise
   }
 
   _mergeArgs(oldArgs, newArgs) {
@@ -266,13 +266,13 @@ export default class Templater {
   locals([type, content, opts]) {
     if (opts && !opts.render) {
       opts.render = (name, newOpts) => {
+        let id = uuid.v4()
         if (!newOpts) {
-          newOpts = _.extend({}, opts)
+          newOpts = _.extend({}, opts, {_inlineRenderId: id})
         }
         if (!opts._renderedPartials) {
           opts._renderedPartials = {}
         }
-        let id = uuid.v4()
         opts._renderedPartials[id] = this.render(name, newOpts)
         return "<<<"+id+">>>"
       }
@@ -283,8 +283,10 @@ export default class Templater {
   localsAfter(result, [type, content, opts]) {
     if (opts._renderedPartials) {
       return Promise.mapSeries(_.keys(opts._renderedPartials), (id) => {
+        if(opts._inlineRenderId == id) return Promise.resolve(result)
         return opts._renderedPartials[id].then((part) => {
           result = result.replace('<<<'+id+'>>>', part)
+          delete opts._renderedPartials[id]
           return result
         })
       }).then(() => {
