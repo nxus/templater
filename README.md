@@ -1,4 +1,4 @@
-# @nxus/templater
+# nxus-templater
 
 ## 
 
