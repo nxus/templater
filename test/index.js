@@ -1,14 +1,14 @@
 /* 
 * @Author: Mike Reich
 * @Date:   2015-12-06 07:20:10
-* @Last Modified 2016-04-16
+* @Last Modified 2016-05-20
 */
 
 'use strict';
 
 import Templater from '../src/'
 
-import TestApp from '@nxus/core/lib/test/support/TestApp';
+import TestApp from 'nxus-core/lib/test/support/TestApp';
 
 describe("Templater", () => {
   var templater;

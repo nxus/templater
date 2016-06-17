@@ -8,7 +8,7 @@ Templates are markup (html, ejs, etc) that Nxus modules can use to render a UX. 
 
 ### Installation
 
-    > npm install @nxus/templater --save
+    > npm install nxus-templater --save
 
 ### Parsers
 
