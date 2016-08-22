@@ -49,11 +49,11 @@
  * 
  * Templater will expose `my-template` as a new template.
  *
- *      app.get('templater').template('path/to/some/dir/')
+ *      app.get('templater').templateDir('path/to/some/dir/')
  *
  * Each template will be processed using the `template` function above.  You can also specify a wrapper template.
  *
- *      app.get('templater').template('path/to/some/dir/', 'page')
+ *      app.get('templater').templateDir('path/to/some/dir/', 'page')
  *
  * #### Function
  * 
@@ -64,7 +64,7 @@
  *     var handler = function(args, name) {
  *       return "<html>.....";
  *     }
- *     app.get('templater').template('default', handler)
+ *     app.get('templater').templateFunction('default', handler)
  *
  * ### Render content using a Template
  * 
@@ -101,7 +101,7 @@
  * 
  * The event handler is passed the original template name and args, so if `req` or other is provided it is available to you, or if you want to only provide context for some templates, but you do not need to return the whole modified args:
  * 
- *     app.get('templater').on('templateContext', (args, name) => {return {username: args.req ? args.req.user : '' }})
+ *     app.get('templater').on('renderContext', (args, name) => {return {username: args.req ? args.req.user : '' }})
  *
  * Templater will also fire a template specific event
  *
