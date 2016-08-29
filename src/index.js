@@ -163,14 +163,14 @@ class Templater extends NxusModule {
     this._templates[name] = {filename, wrapper}
   }
 
-  templateDir(dirname, wrapper) {
+  templateDir(dirname, wrapper, type="*") {
     var opts = {
       dot: true,
       mark: true
     }
 
     if (! dirname.includes("*")) {
-      dirname += "*"
+      dirname += "*." + type
     }
 
     return globAsync(dirname, opts).then((files) => {
