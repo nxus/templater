@@ -10,17 +10,20 @@
  * 
  * ## Installation
  * 
- *     > npm install @nxus/templater --save
+ *     > npm install nxus-templater --save
  * 
  * ## Parsers
  * 
- * Templater supports EJS and HTML as default template types.  If you'd like to add in additional parsers, check out the @nxus/renderer documentation.
+ * Templater supports EJS and HTML as default template types.  If you'd like to add in additional parsers, check out the renderer documentation.
  * 
  * ## Namespacing
  * 
- * All templates share a single namespace, so its a good idea to add a prefix to your template names to avoid conflicts.  For example `mymodule-mytemplate`.
+ * All templates share a single namespace, so its a good idea to add a prefix to your template names to avoid conflicts.  For example `mymodule-mytemplate.ejs`.
+ * 
  * 
  * ## Usage
+ * 
+ *   import {templater} from 'nxus-templater'
  * 
  * ### Register a Template
  *
@@ -30,13 +33,13 @@
  * 
  * If you would like to register a single template, you can use the template provider and specify a file:
  * 
- *     app.get('templater').template('path/to/some/file.ejs')
+ *     templater.template('path/to/some/file.ejs')
  *
  * Based on the filename, the template will be given the name `file` and rendered using the EJS renderer.
  *
  * Optionally, you can specify another template to wrap the output (for partial style templates).
  *
- *     app.get('templater').template('path/to/some/file.ejs', 'page')
+ *     templater.template('path/to/some/file.ejs', 'page')
  *
  * #### Template Directory
  *
@@ -49,11 +52,15 @@
  * 
  * Templater will expose `my-template` as a new template.
  *
- *      app.get('templater').templateDir('path/to/some/dir/')
+ *      templater.templateDir('path/to/some/dir/')
  *
  * Each template will be processed using the `template` function above.  You can also specify a wrapper template.
  *
- *      app.get('templater').templateDir('path/to/some/dir/', 'page')
+ *      templater.templateDir('path/to/some/dir/', 'page')
+ *
+ * Alt you can specify a glob pattern to only register certain files:
+ *
+ *      templater.templateDir('path/to/some/dir/myname-*.ejs', 'page')
  *
  * #### Function
  * 
@@ -64,13 +71,13 @@
  *     var handler = function(args, name) {
  *       return "<html>.....";
  *     }
- *     app.get('templater').templateFunction('default', handler)
+ *     templater.templateFunction('default', handler)
  *
  * ### Render content using a Template
  * 
  *     let opts = {content: "some content"}
  * 
- *     app.get('templater').render('default', opts).then((content) => {
+ *     templater.render('default', opts).then((content) => {
  *       console.log('rendered content', content)
  *     })
  * 
@@ -79,7 +86,7 @@
  * If you want to specify a different wrapper template than was originally set, you can add a `template` key to the opts object.
  *
  *     opts.template = 'new-template'
- *     app.get('templater').render('partial-template', opts).then((content) => {
+ *     templater.render('partial-template', opts).then((content) => {
  *       console.log('rendered complete content', content)l
  *     })
  *
@@ -97,22 +104,22 @@
  * 
  * Modules can provide additional context options to be available to templates. :
  * 
- *     app.get('templater').on('renderContext', () => {return {username: 'Steve'}})
+ *     templater.on('renderContext', () => {return {username: 'Steve'}})
  * 
  * The event handler is passed the original template name and args, so if `req` or other is provided it is available to you, or if you want to only provide context for some templates, but you do not need to return the whole modified args:
  * 
- *     app.get('templater').on('renderContext', (args, name) => {return {username: args.req ? args.req.user : '' }})
+ *     templater.on('renderContext', (args, name) => {return {username: args.req ? args.req.user : '' }})
  *
  * Templater will also fire a template specific event
  *
- *     app.get('templater').on('renderContext.my-template', () => {return {username: 'Steve'}}) 
+ *     templater.on('renderContext.my-template', () => {return {username: 'Steve'}}) 
  * 
  * Values that are arrays are concated rather than overwritten, so that for instance `scripts` can collect script URLs from many modules:
  * 
- *     app.get('templater').on('renderContext', () => {return {scripts: ['/url/script.js']}})
- *     app.get('templater').on('renderContext', () => {return {scripts: ['/url/other.js']}})
+ *     templater.on('renderContext', () => {return {scripts: ['/url/script.js']}})
+ *     templater.on('renderContext', () => {return {scripts: ['/url/other.js']}})
  * 
- * Will result in `scripts` containing an array with both these values. The list will be filtered to only have unique values, so you can specify scripts in dependency order and not worry if other modules are asking for the same common js files repeatedly. The default set of templates provided by this module include rendering of this `scripts` variable automatically.
+ * Will result in `scripts` containing an array with both these values. The list will be filtered to only have unique values, so you can specify scripts in dependency order and not worry if other modules are asking for the same common js files repeatedly. The default set of templates provided by this module include rendering of this `scripts` variable already.
  * 
  * # API
  * -----
@@ -120,61 +127,53 @@
 
 'use strict';
 
-global.Promise = require('bluebird')
 import fs from 'fs'
 import path from 'path'
 import glob from 'glob'
-import uuid from 'node-uuid'
 import _ from 'underscore'
 
 import Promise from 'bluebird'
 var globAsync = Promise.promisify(glob)
 
-import DefaultTemplate from '../templates/default'
+import {application, NxusModule} from 'nxus-core'
+import {renderer} from './modules/renderer'
+
 
 /** 
- * Templater provides a template layer, built on top of the Nxus Renderer
+ * Templater provides template registering and rendering, built on top of the renderer
  */
-export default class Templater {
+class Templater extends NxusModule {
 
   constructor(app) {
-
-    new DefaultTemplate(app)
-
-    this.app = app
+    super(app)
 
     this._templates = {}
-
-    app.get('templater').use(this)
-    .gather('template')
-    .gather('templateFunction')
-    .gather('templateDir')
-    .respond('render')
-    .respond('getTemplate')
-    .respond('getTemplates')
-
-    app.get('renderer').before('render', this.locals.bind(this))
-    app.get('renderer').after('render', this.localsAfter.bind(this))
   }
 
+  /**
+   * Returns the specified template if it exists
+   * @param  {String} name The name of the template.
+   * @return {Object}      A template object, with `type` and `handler` attributes.
+   */
   template(filename, wrapper, name=null) {
     if (name === null) {
       name = path.basename(filename).split(".")[0]
     }
-    this.app.log('registering template', name)
+    this.log.debug('registering template', name, filename)
     this._templates[name] = {filename, wrapper}
   }
 
-  templateDir(dirname, wrapper, type="*") {
+  templateDir(dirname, wrapper) {
     var opts = {
-      cwd: dirname,
       dot: true,
       mark: true
     }
 
-    let pattern = "*."+type
+    if (! dirname.includes("*")) {
+      dirname += "*"
+    }
 
-    return globAsync(pattern, opts).then((files) => {
+    return globAsync(dirname, opts).then((files) => {
       return Promise.map(files, (file) => {
         return this.template(dirname+"/"+file, wrapper)
       })
@@ -182,7 +181,7 @@ export default class Templater {
   }
 
   templateFunction(name, wrapper, handler) {
-    this.app.log('registering template', name)
+    this.log.debug ('registering template', name, "as function")
     if(!handler) {
       handler = wrapper
       wrapper = null
@@ -211,6 +210,12 @@ export default class Templater {
     return this._templates
   }
 
+  /**
+   * Render a registered template with arguments
+   * @param  {String} name The name of the template.
+   * @param  {Object} args Variables to make available to the template
+   * @return {Promise}     The rendered content as a string
+   */
   render(name, args = {}) {
     if(!this._templates[name]) throw new Error('Template name '+name+' not found')
     return this.emit('renderContext', args, name).then((args1) => { 
@@ -263,36 +268,7 @@ export default class Templater {
     return oldArgs
   }
   
-  locals([type, content, opts]) {
-    if (opts && !opts.render) {
-      opts.render = (name, newOpts) => {
-        let id = uuid.v4()
-        if (!newOpts) {
-          newOpts = _.extend({}, opts, {_inlineRenderId: id})
-        }
-        if (!opts._renderedPartials) {
-          opts._renderedPartials = {}
-        }
-        opts._renderedPartials[id] = this.render(name, newOpts)
-        return "<<<"+id+">>>"
-      }
-    }
-    return [type, content, opts]
-  }
-  
-  localsAfter(result, [type, content, opts]) {
-    if (opts._renderedPartials) {
-      return Promise.mapSeries(_.keys(opts._renderedPartials), (id) => {
-        if(opts._inlineRenderId == id) return Promise.resolve(result)
-        return opts._renderedPartials[id].then((part) => {
-          result = result.replace('<<<'+id+'>>>', part)
-          delete opts._renderedPartials[id]
-          return result
-        })
-      }).then(() => {
-        return result
-      })
-    }
-    return result
-  }
 }
+
+let templater = Templater.getProxy()
+export {Templater as default, templater}

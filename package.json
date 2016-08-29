@@ -1,20 +1,20 @@
 {
   "name": "nxus-templater",
-  "version": "3.0.0",
+  "version": "4.0.0",
   "description": "The template manager for Nxus applications",
   "main": "lib",
   "scripts": {
     "preversion": "npm test",
     "postversion": "npm run build-docs && git push && git push --tags",
-    "test": "npm run compile && NODE_ENV=test mocha --compilers js:babel-core/register -R spec",
-    "compile": "babel src --out-dir lib",
+    "test": "NODE_ENV=test mocha --compilers js:babel-core/register -R spec src/test/* src/modules/**/test/*",
+    "compile": "babel src --out-dir lib --ignore src/modules/template-default/template/js/*,src/modules/template-default/template/dist/*,src/modules/template-default/template/bower_components/* && cp -r src/modules/template-default/template lib/modules/template-default/",
     "prepublish": "npm run compile",
     "build-docs": "export NAME=`npm view . name`; export VERSION=`npm view . version`; documentation readme ./src/*.js --name $NAME --project-version $VERSION --readme-file ./README.md -s $NAME",
     "publish-docs": "npm run build-docs && git add ./README.md && git commit -m 'Updated README API Docs' && git push"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/nxus/template-manager.git"
+    "url": "https://github.com/nxus/templater.git"
   },
   "author": "",
   "license": "MIT",
@@ -24,13 +24,12 @@
   "homepage": "https://github.com/nxus/template-manager",
   "dependencies": {
     "bluebird": "^3.0.6",
+    "ejs": "^2.3.4",
     "glob": "^6.0.1",
+    "moment": "^2.11.2",
+    "nxus-core": "^4.0.0-0",
     "node-uuid": "^1.4.7",
     "underscore": "^1.8.3"
-  },
-  "peerDependencies": {
-    "nxus-core": "^3.0.0",
-    "nxus-renderer": "^3.0.0"
   },
   "devDependencies": {
     "mocha": "^2.2.5",
@@ -39,6 +38,7 @@
     "chai": "^3.5.0",
     "documentation": "^4.0.0-beta9",
     "chai-as-promised": "^5.2.0",
+    "babel-plugin-transform-function-bind": "^6.8.0",
     "babel-preset-es2015": "^6.9.0",
     "babel-cli": "^6.9.0",
     "babel-core": "^6.9.0"

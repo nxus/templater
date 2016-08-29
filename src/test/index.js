@@ -6,21 +6,23 @@
 
 'use strict';
 
-import Templater from '../src/'
+import {application as app} from 'nxus-core'
+import Templater from '../'
+import {templater as templaterProxy} from '../'
 
-import TestApp from 'nxus-core/lib/test/support/TestApp';
 
 describe("Templater", () => {
-  var templater;
-  var app = new TestApp();
- 
+  var templater
+  
   beforeEach(() => {
-    app = new TestApp();
     templater = new Templater(app);
   });
   
   describe("Load", () => {
-    it("should not be null", () => Templater.should.not.be.null)
+    it("should not be null", () => {
+      Templater.should.not.be.null
+      templaterProxy.should.not.be.null
+    })
 
     it("should be instantiated", () => {
       templater.should.not.be.null;
