@@ -18,7 +18,7 @@ class TemplaterEjs extends NxusModule {
       opts.render = (name, newOpts) => {
         let id = uuid.v4()
         if (!newOpts) {
-          newOpts = _.extend({}, opts, {_inlineRenderId: id})
+          newOpts = { ...opts, _inlineRenderId: id}
         }
         if (!opts._renderedPartials) {
           opts._renderedPartials = {}
@@ -32,7 +32,7 @@ class TemplaterEjs extends NxusModule {
   
   _localsAfter(result, [type, content, opts]) {
     if (opts._renderedPartials) {
-      return Promise.mapSeries(_.keys(opts._renderedPartials), (id) => {
+      return Promise.mapSeries(Object.keys(opts._renderedPartials), (id) => {
         if(opts._inlineRenderId == id) return Promise.resolve(result)
         return opts._renderedPartials[id].then((part) => {
           result = result.replace('<<<'+id+'>>>', part)
@@ -47,3 +47,6 @@ class TemplaterEjs extends NxusModule {
   }
 
 }
+
+let templaterEjs = TemplaterEjs.getProxy()
+export {TemplaterEjs as default, templaterEjs}

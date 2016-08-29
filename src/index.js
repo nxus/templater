@@ -170,12 +170,12 @@ class Templater extends NxusModule {
     }
 
     if (! dirname.includes("*")) {
-      dirname += "*." + type
+      dirname += "/*." + type
     }
 
     return globAsync(dirname, opts).then((files) => {
       return Promise.map(files, (file) => {
-        return this.template(dirname+"/"+file, wrapper)
+        return this.template(file, wrapper)
       })
     });
   }
@@ -235,7 +235,7 @@ class Templater extends NxusModule {
 
     if(opts.filename){
       args.filename = opts.filename
-      promise = this.app.get('renderer').renderFile(opts.filename, args)
+      promise = renderer.renderFile(opts.filename, args)
     }
     
     if(opts.handler)

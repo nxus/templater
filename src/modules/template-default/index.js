@@ -23,9 +23,12 @@ class TemplateDefault extends NxusModule {
     templater.default().template(dir+'/scripts.ejs');
     templater.default().template(dir+'/scripts_include.ejs');
 
-    router.default().static("/dist", dir+"/dist")
-    router.default().static("/js", dir+"/js")
-    router.default().static("/bower_components", dir+"/bower_components")
+    router.default().staticRoute("/dist", dir+"/dist")
+    router.default().staticRoute("/js", dir+"/js")
+    router.default().staticRoute("/bower_components", dir+"/bower_components")
   }
 
 }
+
+let templateDefault = TemplateDefault.getProxy()
+export {TemplateDefault as default, templateDefault}
