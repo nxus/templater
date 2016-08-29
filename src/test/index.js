@@ -36,32 +36,6 @@ describe("Templater", () => {
       });
     });
 
-    it("should register a gather for templates", () => {
-      return app.emit('load').then(() => {
-        app.get.calledWith('templater').should.be.true;
-        app.get().gather.calledWith('template').should.be.true;
-      });
-    })
-
-    it("should register a gather for templateFile", () => {
-      return app.emit('load').then(() => {
-        app.get.calledWith('templater').should.be.true;
-        app.get().gather.calledWith('templateFunction').should.be.true;
-      });
-    })
-    
-    it("should register a gather for templateDirs", () => {
-      return app.emit('load').then(() => {
-        app.get.calledWith('templater').should.be.true;
-        app.get().gather.calledWith('templateDir').should.be.true;
-      });
-    })
-
-    it("should register a provider for render", () => {
-      return app.emit('load').then(() => {
-        app.get().respond.calledWith('render').should.be.true;
-      });
-    })
   });
 
   describe("_mergeArgs", () => {
