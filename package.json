@@ -7,7 +7,7 @@
     "preversion": "npm test",
     "postversion": "npm run build-docs && git push && git push --tags",
     "test": "NODE_ENV=test mocha --compilers js:babel-core/register -R spec src/test/*.js src/modules/**/test/*.js",
-    "compile": "babel src --out-dir lib --ignore src/modules/template-default/template/js/*,src/modules/template-default/template/dist/*,src/modules/template-default/template/bower_components/* && cp -r src/modules/template-default/template lib/modules/template-default/",
+    "compile": "babel src --out-dir lib",
     "prepublish": "npm run compile",
     "build-docs": "export NAME=`npm view . name`; export VERSION=`npm view . version`; documentation readme ./src/*.js ./src/modules/*/*.js --name $NAME --project-version $VERSION --readme-file ./README.md -s $NAME",
     "publish-docs": "npm run build-docs && git add ./README.md && git commit -m 'Updated README API Docs' && git push"
@@ -19,9 +19,9 @@
   "author": "",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/nxus/template-manager/issues"
+    "url": "https://github.com/nxus/templater/issues"
   },
-  "homepage": "https://github.com/nxus/template-manager",
+  "homepage": "https://github.com/nxus/templater",
   "dependencies": {
     "bluebird": "^3.0.6",
     "ejs": "^2.3.4",
@@ -39,7 +39,7 @@
     "documentation": "^4.0.0-beta9",
     "chai-as-promised": "^5.2.0",
     "babel-plugin-transform-function-bind": "^6.8.0",
-    "babel-plugin-transform-object-rest-spread": "^6.9.0",
+    "babel-plugin-transform-object-rest-spread": "^6.8.0",
     "babel-preset-es2015": "^6.9.0",
     "babel-cli": "^6.9.0",
     "babel-core": "^6.9.0"
