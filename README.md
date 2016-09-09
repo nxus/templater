@@ -130,15 +130,36 @@ Templater provides template registering and rendering, built on top of the rende
 
 ### template
 
-Returns the specified template if it exists
+Registers the specified template. By default, the template name will match the file name, and the renderer 
+used will be determined by the file extension. For example: `./templates/my-template.ejs` will be registered as 
+`my-template` using the EJS rendering engine.
 
 **Parameters**
 
--   `filename`  
--   `wrapper`  
--   `name` **\[[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)](default null)** The name of the template.
+-   `filename` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** the path of the template file to register.
+-   `wrapper` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** Optionally, the name of another template to use as a wrapper
+-   `name` **\[[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)](default null)** Optional. Specify a different name to use to register the template file.
 
-Returns **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** A template object, with `type` and `handler` attributes.
+### templateDir
+
+Registers all templates in the specified directory.
+
+**Parameters**
+
+-   `dirname` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** Either a path or a glob of files to register
+-   `wrapper` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** Optionally, the name of another template to use as a wrapper
+-   `type` **\[[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)](default "\*")** Optionally, the specific type of file to register. Defaults to all.
+
+### templateFunction
+
+Register a handler function as a template. The registered function should return either a string or a Promise
+that resolves to string containing the template.
+
+**Parameters**
+
+-   `name` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** The name of the template.
+-   `wrapper` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** Optionally, the name of another template to use as a wrapper
+-   `handler` **[Function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function)** The handler function to use.
 
 ### getTemplate
 

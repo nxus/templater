@@ -1,7 +1,7 @@
 /* 
 * @Author: Mike Reich
 * @Date:   2015-07-22 09:45:05
-* @Last Modified 2016-05-19
+* @Last Modified 2016-09-09
 */
 /**
  * [![Build Status](https://travis-ci.org/nxus/templater.svg?branch=master)](https://travis-ci.org/nxus/templater)
@@ -151,11 +151,15 @@ class Templater extends NxusModule {
   }
 
   /**
-   * Returns the specified template if it exists
-   * @param  {String} name The name of the template.
-   * @return {Object}      A template object, with `type` and `handler` attributes.
+   * Registers the specified template. By default, the template name will match the file name, and the renderer 
+   * used will be determined by the file extension. For example: `./templates/my-template.ejs` will be registered as 
+   * `my-template` using the EJS rendering engine.
+   * 
+   * @param  {String} filename the path of the template file to register. 
+   * @param  {String} wrapper  Optionally, the name of another template to use as a wrapper
+   * @param  {String} name     Optional. Specify a different name to use to register the template file.
    */
-  template(filename, wrapper, name=null) {
+  template(filename, wrapper, name = null) {
     if (name === null) {
       name = path.basename(filename).split(".")[0]
     }
@@ -163,6 +167,12 @@ class Templater extends NxusModule {
     this._templates[name] = {filename, wrapper}
   }
 
+  /** 
+   * Registers all templates in the specified directory.
+   * @param  {String} dirname Either a path or a glob of files to register
+   * @param  {String} wrapper Optionally, the name of another template to use as a wrapper 
+   * @param  {String} type    Optionally, the specific type of file to register. Defaults to all.
+   */
   templateDir(dirname, wrapper, type="*") {
     var opts = {
       dot: true,
@@ -180,6 +190,14 @@ class Templater extends NxusModule {
     });
   }
 
+  /**
+   * Register a handler function as a template. The registered function should return either a string or a Promise
+   * that resolves to string containing the template.
+   * 
+   * @param  {String} name    The name of the template.
+   * @param  {String} wrapper Optionally, the name of another template to use as a wrapper 
+   * @param  {Function} handler The handler function to use.
+   */
   templateFunction(name, wrapper, handler) {
     this.log.debug ('registering template', name, "as function")
     if(!handler) {
