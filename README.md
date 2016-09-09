@@ -2,6 +2,8 @@
 
 ## 
 
+## Templater
+
 [![Build Status](https://travis-ci.org/nxus/templater.svg?branch=master)](https://travis-ci.org/nxus/templater)
 
 Templates are markup (html, ejs, etc) that Nxus modules can use to render a UX.  The Templater module provides a common API for defining and accessing templates.  Specifically, you can use partials and templates defined by other modules, meaning you write less code for common components.
@@ -20,7 +22,7 @@ All templates share a single namespace, so its a good idea to add a prefix to yo
 
 ### Usage
 
-  import {templater} from 'nxus-templater'
+    import {templater} from 'nxus-templater'
 
 #### Register a Template
 
@@ -118,10 +120,6 @@ Values that are arrays are concated rather than overwritten, so that for instanc
 
 Will result in `scripts` containing an array with both these values. The list will be filtered to only have unique values, so you can specify scripts in dependency order and not worry if other modules are asking for the same common js files repeatedly. The default set of templates provided by this module include rendering of this `scripts` variable already.
 
-## API
-
-* * *
-
 ## Templater
 
 **Extends NxusModule**
@@ -190,15 +188,9 @@ Returns **[Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Refe
 
 ## 
 
-[![Build Status](https://travis-ci.org/nxus/renderer.svg?branch=master)](https://travis-ci.org/nxus/renderer)
+## Renderer
 
-A rendering framework for Nxus applications.
-
-### Installation
-
-Included in nxus-templater:
-
-> npm install nxus-templater
+The rendering framework for Nxus applications.
 
 ### Usage
 

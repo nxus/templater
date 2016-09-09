@@ -1,17 +1,12 @@
 /* 
 * @Author: Mike Reich
 * @Date:   2015-11-09 18:55:29
-* @Last Modified 2016-04-26
+* @Last Modified 2016-09-09
 */
 /**
- * [![Build Status](https://travis-ci.org/nxus/renderer.svg?branch=master)](https://travis-ci.org/nxus/renderer)
+ * # Renderer
  * 
- * A rendering framework for Nxus applications.
- * 
- * ## Installation
- * 
- * Included in nxus-templater:
- *    > npm install nxus-templater
+ * The rendering framework for Nxus applications.
  * 
  * ## Usage
  * 

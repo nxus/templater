@@ -4,6 +4,8 @@
 * @Last Modified 2016-09-09
 */
 /**
+ * # Templater
+ * 
  * [![Build Status](https://travis-ci.org/nxus/templater.svg?branch=master)](https://travis-ci.org/nxus/templater)
  * 
  * Templates are markup (html, ejs, etc) that Nxus modules can use to render a UX.  The Templater module provides a common API for defining and accessing templates.  Specifically, you can use partials and templates defined by other modules, meaning you write less code for common components.
@@ -23,7 +25,7 @@
  * 
  * ## Usage
  * 
- *   import {templater} from 'nxus-templater'
+ *     import {templater} from 'nxus-templater'
  * 
  * ### Register a Template
  *
@@ -120,9 +122,6 @@
  *     templater.on('renderContext', () => {return {scripts: ['/url/other.js']}})
  * 
  * Will result in `scripts` containing an array with both these values. The list will be filtered to only have unique values, so you can specify scripts in dependency order and not worry if other modules are asking for the same common js files repeatedly. The default set of templates provided by this module include rendering of this `scripts` variable already.
- * 
- * # API
- * -----
  */
 
 'use strict';
