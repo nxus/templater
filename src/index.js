@@ -4,7 +4,7 @@
 * @Last Modified 2016-09-09
 */
 /**
- * # Templater
+ * # Templater Module
  * 
  * [![Build Status](https://travis-ci.org/nxus/templater.svg?branch=master)](https://travis-ci.org/nxus/templater)
  * 
@@ -122,6 +122,9 @@
  *     templater.on('renderContext', () => {return {scripts: ['/url/other.js']}})
  * 
  * Will result in `scripts` containing an array with both these values. The list will be filtered to only have unique values, so you can specify scripts in dependency order and not worry if other modules are asking for the same common js files repeatedly. The default set of templates provided by this module include rendering of this `scripts` variable already.
+ *
+ * # Templater API
+ * ------
  */
 
 'use strict';

@@ -4,7 +4,7 @@
 * @Last Modified 2016-09-09
 */
 /**
- * # Renderer
+ * # Renderer Module
  * 
  * The rendering framework for Nxus applications.
  * 
@@ -32,7 +32,7 @@
  * 
  * You can pass an optional arugment `opts` for options to pass to the renderer.
  * 
- * # API
+ * # Renderer API
  * ------
  */
 'use strict';

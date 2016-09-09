@@ -2,7 +2,7 @@
 
 ## 
 
-## Templater
+## Templater Module
 
 [![Build Status](https://travis-ci.org/nxus/templater.svg?branch=master)](https://travis-ci.org/nxus/templater)
 
@@ -120,6 +120,10 @@ Values that are arrays are concated rather than overwritten, so that for instanc
 
 Will result in `scripts` containing an array with both these values. The list will be filtered to only have unique values, so you can specify scripts in dependency order and not worry if other modules are asking for the same common js files repeatedly. The default set of templates provided by this module include rendering of this `scripts` variable already.
 
+## Templater API
+
+* * *
+
 ## Templater
 
 **Extends NxusModule**
@@ -188,7 +192,7 @@ Returns **[Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Refe
 
 ## 
 
-## Renderer
+## Renderer Module
 
 The rendering framework for Nxus applications.
 
@@ -216,7 +220,7 @@ You can pass an optional arugment `opts` for options to pass to the renderer.
 
 You can pass an optional arugment `opts` for options to pass to the renderer.
 
-## API
+## Renderer API
 
 * * *
 
