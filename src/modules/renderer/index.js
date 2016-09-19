@@ -90,7 +90,7 @@ class Renderer extends NxusModule {
       content = content.toString()
       const type = path.extname(filename).replace(".", "");
       opts.filename = filename
-      return this.render(type, content, opts)
+      return this.request('render', type, content, opts)
     })
   }
 

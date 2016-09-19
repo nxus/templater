@@ -17,9 +17,7 @@ class TemplaterEjs extends NxusModule {
   _locals([type, content, opts]) {
     if (opts && !opts.render) {
       opts.render = (name, newOpts) => {
-        console.log('render called', name, 'from', opts.template)
         let id = uuid.v4()
-        debugger
         if (!newOpts) {
           newOpts = { ...opts, _inlineRenderId: id}
           if (newOpts._renderedPartials) {
