@@ -26,7 +26,9 @@ class EjsRenderer extends NxusModule {
     var filename = data.filename || process.cwd();
     data._ = _
     data.moment = moment
-    return ejs.render(content, data, {filename: filename});
+    return Promise.resolve().then(() => {
+      return ejs.render(content, data, {filename: filename})
+    });
   }
 }
 
