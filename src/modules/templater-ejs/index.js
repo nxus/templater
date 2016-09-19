@@ -22,6 +22,9 @@ class TemplaterEjs extends NxusModule {
         debugger
         if (!newOpts) {
           newOpts = { ...opts, _inlineRenderId: id}
+          if (newOpts._renderedPartials) {
+            delete newOpts._renderedPartials
+          }
         }
         if (!opts._renderedPartials) {
           opts._renderedPartials = {}
