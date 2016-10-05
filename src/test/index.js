@@ -88,7 +88,7 @@ describe("Templater", () => {
       templater.template("path/to/filename.ejs", 'default')
       templater._templates.should.have.property("filename")
       templater._templates.filename.filename.should.eql('path/to/filename.ejs')
-      templater._templates.filename.wrapper.should.eql('default')
+      templater._templates.filename.layout.should.eql('default')
     })
   })
 });
