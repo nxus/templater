@@ -56,7 +56,7 @@
  *
  *      templater.templateDir('path/to/some/dir/')
  *
- * Each template will be processed using the `template` function above.  You can also specify a wrapper template.
+ * Each template will be processed using the `template` function above.  You can also specify a layout that the template will be wrapped in.
  *
  *      templater.templateDir('path/to/some/dir/', 'page')
  *
@@ -83,9 +83,9 @@
  *       console.log('rendered content', content)
  *     })
  * 
- * ### Override the template wrapper
+ * ### Override the template layout
  *
- * If you want to specify a different wrapper template than was originally set, you can add a `template` key to the opts object.
+ * If you want to specify a different layout template than was originally set, you can add a `template` key to the opts object.
  *
  *     opts.template = 'new-template'
  *     templater.render('partial-template', opts).then((content) => {
@@ -158,24 +158,24 @@ class Templater extends NxusModule {
    * `my-template` using the EJS rendering engine.
    * 
    * @param  {String} filename the path of the template file to register. 
-   * @param  {String} wrapper  Optionally, the name of another template to use as a wrapper
+   * @param  {String} layout  Optionally, the name of another template to use as a layout
    * @param  {String} name     Optional. Specify a different name to use to register the template file.
    */
-  template(filename, wrapper, name = null) {
+  template(filename, layout, name = null) {
     if (name === null) {
       name = path.basename(filename).split(".")[0]
     }
     this.log.debug('registering template', name, filename)
-    this._templates[name] = {filename, wrapper}
+    this._templates[name] = {filename, layout}
   }
 
   /** 
    * Registers all templates in the specified directory.
    * @param  {String} dirname Either a path or a glob of files to register
-   * @param  {String} wrapper Optionally, the name of another template to use as a wrapper 
+   * @param  {String} layout Optionally, the name of another template to use as a layout 
    * @param  {String} type    Optionally, the specific type of file to register. Defaults to all.
    */
-  templateDir(dirname, wrapper, type="*") {
+  templateDir(dirname, layout, type="*") {
     var opts = {
       dot: true,
       mark: true
@@ -187,7 +187,7 @@ class Templater extends NxusModule {
 
     return globAsync(dirname, opts).then((files) => {
       return Promise.map(files, (file) => {
-        return this.template(file, wrapper)
+        return this.template(file, layout)
       })
     });
   }
@@ -197,16 +197,16 @@ class Templater extends NxusModule {
    * that resolves to string containing the template.
    * 
    * @param  {String} name    The name of the template.
-   * @param  {String} wrapper Optionally, the name of another template to use as a wrapper 
+   * @param  {String} layout Optionally, the name of another template to use as a layout 
    * @param  {Function} handler The handler function to use.
    */
-  templateFunction(name, wrapper, handler) {
+  templateFunction(name, layout, handler) {
     this.log.debug ('registering template', name, "as function")
     if(!handler) {
-      handler = wrapper
-      wrapper = null
+      handler = layout
+      layout = null
     }
-    this._templates[name] = {handler, wrapper}
+    this._templates[name] = {handler, layout}
   }
 
   _typeFromFile(filename) {
@@ -261,8 +261,8 @@ class Templater extends NxusModule {
     if(opts.handler)
       promise = Promise.resolve(opts.handler(args, name))
 
-    if (opts.wrapper || args.template) {
-      let template = args.template || opts.wrapper
+    if (opts.layout || args.template) {
+      let template = args.template || opts.layout
       delete args.template
       return promise.then((content) => {
         return this.render(template, Object.assign(args, {content}))
