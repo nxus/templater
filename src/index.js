@@ -238,11 +238,17 @@ class Templater extends NxusModule {
    */
   render(name, args = {}) {
     if(!this._templates[name]) throw new Error('Template name '+name+' not found')
-    return this.emit('renderContext', args, name).then((args1) => { 
-      args = this._mergeArgs(args, args1)
+    return this.emit('renderContext', args, name).then((args1) => {
+      // no listeners returns name as second arg
+      if (!(args1 && args1.length == 2 && args1[1] == name)) {
+        args = this._mergeArgs(args, args1)
+      }
       return this.emit('renderContext.'+name, args, name)
-    }).then((newArgs) => {
-      args = this._mergeArgs(args, newArgs)
+    }).then((args1) => {
+      // no listeners returns name as second arg
+      if (!(args1 && args1.length == 2 && args1[1] == name)) {
+        args = this._mergeArgs(args, args1)
+      }
       return args
     }).then((args) => {
       return this._render(name, args)
