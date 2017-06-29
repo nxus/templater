@@ -1,3 +1,4 @@
+import Promise from 'bluebird'
 import uuid from 'uuid'
 
 import {NxusModule} from 'nxus-core'
@@ -35,7 +36,7 @@ class TemplaterEjs extends NxusModule {
     }
     return [type, content, opts]
   }
-  
+
   _localsAfter(result, [type, content, opts]) {
     if (opts._renderedPartials && _.isString(result)) {
       return Promise.mapSeries(Object.keys(opts._renderedPartials), (id) => {
