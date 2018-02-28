@@ -18,9 +18,8 @@ class TemplaterEjs extends NxusModule {
   _locals([type, content, opts]) {
     if (opts) {
       // {id: inner promise} for all renders inside the current template
-      if (!opts._renderedPartials) {
-        opts._renderedPartials = {}
-      }
+      opts._renderedPartials = {}
+
       opts.render = (name, newOpts) => {
         let id = uuid.v4()
         // new levels should get their own _renderedPartials and render
