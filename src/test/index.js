@@ -26,7 +26,7 @@ describe("Ejs render", () => {
   it("should render nested ejs templates", (done) => {
     templaterProxy.templateDir(__dirname+"/templates/*.ejs").then(() => {
       templaterProxy.render('page', {x: 1}).then((result) => {
-          result.should.equal("Page Outer 1 Inner 1\n\n\n")
+          result.should.equal("Page Outer 1 Inner 1\nInner 2\n\nOuter 2 Inner 2\nInner 3\n\n\n")
         done()
       })
     })

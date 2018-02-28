@@ -16,21 +16,23 @@ class TemplaterEjs extends NxusModule {
   }
 
   _locals([type, content, opts]) {
-    if (opts && !opts.render) {
+    if (opts) {
+      // {id: inner promise} for all renders inside the current template
+      if (!opts._renderedPartials) {
+        opts._renderedPartials = {}
+      }
       opts.render = (name, newOpts) => {
         let id = uuid.v4()
+        // new levels should get their own _renderedPartials and render
         if (!newOpts) {
-          newOpts = { ...opts, _inlineRenderId: id}
-          if (newOpts._renderedPartials) {
-            delete newOpts._renderedPartials
-          }
+          newOpts = _.omit(opts, "_renderedPartials", "render")
         }
-        if (!opts._renderedPartials) {
-          opts._renderedPartials = {}
-        }
+        newOpts._inlineRenderId = id
+        // save the promise for this render in the parent opts
         opts._renderedPartials[id] = templater.render(name, newOpts).catch((e) => {
           this.log.error('Error rendering inline partial', e)
         })
+
         return "<<<"+id+">>>"
       }
     }
@@ -39,6 +41,7 @@ class TemplaterEjs extends NxusModule {
 
   _localsAfter(result, [type, content, opts]) {
     if (opts._renderedPartials && _.isString(result)) {
+      // replace the id placeholders in this template with the results of the renderedPartials promises
       return Promise.mapSeries(Object.keys(opts._renderedPartials), (id) => {
         if(opts._inlineRenderId == id) return Promise.resolve(result)
         return opts._renderedPartials[id].then((part) => {
