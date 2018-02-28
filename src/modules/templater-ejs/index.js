@@ -26,12 +26,11 @@ class TemplaterEjs extends NxusModule {
           }
         }
         if (!opts._renderedPartials) {
-          opts._renderedPartials = []
+          opts._renderedPartials = {}
         }
-        let innerRender = templater.render(name, newOpts).catch((e) => {
+        opts._renderedPartials[id] = templater.render(name, newOpts).catch((e) => {
           this.log.error('Error rendering inline partial', e)
         })
-        opts._renderedPartials.push([id, innerRender])
         return "<<<"+id+">>>"
       }
     }
@@ -40,9 +39,9 @@ class TemplaterEjs extends NxusModule {
 
   _localsAfter(result, [type, content, opts]) {
     if (opts._renderedPartials && _.isString(result)) {
-      return Promise.mapSeries(opts._renderedPartials, ([id, innerRender]) => {
+      return Promise.mapSeries(Object.keys(opts._renderedPartials), (id) => {
         if(opts._inlineRenderId == id) return Promise.resolve(result)
-        return innerRender.then((part) => {
+        return opts._renderedPartials[id].then((part) => {
           result = result.replace('<<<'+id+'>>>', part)
           delete opts._renderedPartials[id]
           return result
