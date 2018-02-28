@@ -9,6 +9,30 @@
 import {application as app} from 'nxus-core'
 import Templater from '../'
 import {templater as templaterProxy} from '../'
+import Renderer from '../modules/renderer'
+import RendererEJS from '../modules/renderer-ejs'
+import TemplaterEJS from '../modules/templater-ejs'
+
+describe("Ejs render", () => {
+  let templater
+  before(() => {
+    new Templater()
+    new Renderer()
+    new RendererEJS()
+    new TemplaterEJS()
+    return app.emit('load')
+
+  })
+  it("should render nested ejs templates", (done) => {
+    templaterProxy.templateDir(__dirname+"/templates/*.ejs").then(() => {
+      templaterProxy.render('page').then((result) => {
+        console.log("result", result)
+          result.should.equal("Page Outer 1 Inner 1\n\n\n")
+        done()
+      })
+    })
+  })
+});
 
 
 describe("Templater", () => {
@@ -91,4 +115,6 @@ describe("Templater", () => {
       templater._templates.filename.layout.should.eql('default')
     })
   })
+
 });
+
