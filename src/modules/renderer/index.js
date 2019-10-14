@@ -1,37 +1,37 @@
-/* 
+/*
 * @Author: Mike Reich
 * @Date:   2015-11-09 18:55:29
 * @Last Modified 2016-09-09
 */
 /**
  * # Renderer Module
- * 
+ *
  * The rendering framework for Nxus applications.
- * 
+ *
  * ## Usage
- * 
- *     import {renderer} from 'nxus-templater/modules/renderer'
- * 
+ *
+ *     import {renderer} from 'nxus-templater/lib/modules/renderer'
+ *
  * ### Defining a renderer
- * 
+ *
  *     renderer.renderer(type, handler);
- * 
+ *
  * Where `type` is usually the filename extension and `handler` returns the rendered text when called with contents to render and an optional `opts` object.
- * 
+ *
  * ### Rendering a string
- * 
+ *
  *     renderer.render(type, text).then((renderedText) => {console.log(renderedText)});
- * 
+ *
  * You can pass an optional arugment `opts` for options to pass to the renderer.
  *
  *     renderer.render(type, text, {title: 'My Title'}).then((renderedText) => {console.log(renderedText)});
- * 
+ *
  * ### Rendering a file
- * 
+ *
  *     renderer.renderFile(type, filename).then((renderedText) => {});
- * 
+ *
  * You can pass an optional arugment `opts` for options to pass to the renderer.
- * 
+ *
  * # Renderer API
  * ------
  */
@@ -50,7 +50,7 @@ import {NxusModule} from 'nxus-core'
  * Renderer renders different files and content using common rendering engines, like EJS and MarkDown.
  */
 class Renderer extends NxusModule {
-  
+
   constructor(app) {
     super(app)
     this._renderers = {};
@@ -70,7 +70,7 @@ class Renderer extends NxusModule {
   /**
    * Request rendered content based on type
    * @param {string} type The type (e.g. 'html') of the content
-   * @param {string} content The contents to render 
+   * @param {string} content The contents to render
    * @param {object} opts Options for the renderer context
    * @return {Promise} The rendered content
    */
