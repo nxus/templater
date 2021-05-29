@@ -44,7 +44,8 @@ class TemplaterEjs extends NxusModule {
         // TODO this probably is never used
         if(opts._inlineRenderId == id) return Promise.resolve(result)
         return opts._renderedPartials[id].then((part) => {
-          result = result.replace('<<<'+id+'>>>', part)
+          result = result.replace('<<<'+id+'>>>', () => part)
+              // use a replacement function to suppress pattern processing in replacement string
           delete opts._renderedPartials[id]
           return result
         })
